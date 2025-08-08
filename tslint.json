@@ -1,0 +1,115 @@
+{
+	"rules": {
+		"class-name": true,
+		"interface-name": [
+			true,
+			"always-prefix"
+		],
+		"space-before-function-paren": [
+			true,
+			{
+				"anonymous": "always",
+				"named": "never",
+				"asyncArrow": "always"
+			}
+		],
+		"no-empty-interface": true,
+		"no-require-imports": true,
+		"one-line": [
+			true,
+			"check-catch",
+			"check-finally",
+			"check-else",
+			"check-open-brace"
+		],
+		"no-duplicate-imports": [
+			true
+		],
+		"eofline": true,
+		"import-spacing": true,
+		"indent": [
+			true,
+			"tabs",
+			2
+		],
+		"max-file-line-count": [
+			true,
+			500
+		],
+		"max-line-length": [
+			true,
+			{
+				"limit": 150,
+				"ignore-pattern": "^import |^export {(.*?)}"
+			}
+		],
+		"variable-name": [
+			true,
+			"ban-keywords",
+			"check-format",
+			"allow-leading-underscore",
+			"require-const-for-all-caps",
+			"allow-pascal-case",
+			"allow-snake-case"
+		],
+		"comment-format": [
+			true,
+			"check-space"
+		],
+		"align": [
+			true,
+			"parameters",
+			"statements"
+		],
+		"semicolon": [
+			true,
+			"never",
+			"ignore-bound-class-methods"
+		],
+		"quotemark": [
+			true,
+			"single",
+			"jsx-double",
+			"avoid-escape"
+		],
+		"no-trailing-whitespace": [
+			true,
+			"ignore-comments"
+		],
+		"typedef-whitespace": [
+			true,
+			{
+				"call-signature": "nospace",
+				"index-signature": "nospace",
+				"parameter": "nospace",
+				"property-declaration": "nospace",
+				"variable-declaration": "nospace"
+			},
+			{
+				"call-signature": "onespace",
+				"index-signature": "onespace",
+				"parameter": "onespace",
+				"property-declaration": "onespace",
+				"variable-declaration": "onespace"
+			}
+		],
+		"no-var-keyword": true,
+		"whitespace": [
+			true,
+			"check-branch",
+			"check-decl",
+			"check-operator",
+			"check-module",
+			"check-separator",
+			"check-type"
+		],
+		"arrow-parens": [
+			true,
+			"ban-single-arg-parens"
+		],
+		"no-internal-module": true,
+		"no-null-keyword": true,
+		"prefer-const": true,
+		"jsdoc-format": true
+	}
+}

@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+  edl_be:
+    container_name: edl_be
+    build:
+      dockerfile: Dockerfile
+      context: .
+      # Only will build development stage from our dockerfile
+      # target: development
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - .env
+      # Run a command against the development stage of the image
+      # command: npm run start:dev
+    ports:
+      - 3001:3000

@@ -1,4 +1,3 @@
-/// <reference types="multer" />
 import { ExceptionService } from './exception.service';
 import * as jwt from 'jsonwebtoken';
 import { PreviewableFileType } from '../utils/types/previewable_file.type';

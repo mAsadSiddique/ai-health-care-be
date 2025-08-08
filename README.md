@@ -90,31 +90,6 @@ There are following modules in our project
 1: Admin Module
 In the Admin module, we manage all administrative functionalities, and there are two roles of admins: Sub-admin and Super-admin. In the entire project, access is granted based on the assigned role.
 
-2: Clinic Module
-In the Clinic module, we handle all clinical functionalities like (add clinic, edit clinic detail) etc...
-
-3: Dentist Module
-In the Dentist module, we handle all dentel functionalities like (add dentist, edit dentist detail) etc...
-
-4: Employee Module
-In the Employee, module we handle all employee functionalities like (add employee, edit employee detail) etc...
-And for employee salary management we have seprate salary module.
-
-5: Financial Tracker Module
-In the Financial Tracker module, we manage all aspects of the clinic's financial management, including both expenses and income. Admins can add and edit details for both expenses and income.
-
-6: Order Module
-In the Order module, we handle all order functionalities like(add order, edit order) etc...
-
-7 Salary Tracker Module
-In the Salary Tracker module, we handle employee salary management, including bonuses and advances. The admin has the ability to add new employees, edit their details, and allocate bonuses and advances as needed.
-
-8: Auth Module
-In the Auth Module, we utilize authentication guards and decorators that are employed throughout the entire project.
-
-9: Shared Module
-In the Shared Module, we use common services and DTOs that are employed throughout the entire project.
-
 ## Utils Folder
 In the Utils folder, we store Enums, Mailer service, and user-defined types that are employed throughout the entire project.
 

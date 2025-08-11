@@ -1,16 +1,21 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 import { ExceptionService } from '../../shared/exception.service'
 import { SharedService } from '../../shared/shared.service'
 import { Reflector } from '@nestjs/core'
 import { GUARDS_KEY } from '../decorators/guards.decorator'
 import { RESPONSE_MESSAGES } from '../../utils/enums/response_messages.enum'
+import { Admin, AdminDocument } from '../../admin/entities/admin.entity'
 
 @Injectable()
 export class CommonAuthGuard implements CanActivate {
 	constructor(
 		private reflector: Reflector,
 		private readonly exceptionService: ExceptionService,
-		private readonly sharedService: SharedService
+		private readonly sharedService: SharedService,
+		@InjectModel(Admin.name)
+		private readonly adminModel: Model<AdminDocument>
 	) {}
 
 	async canActivate(context: ExecutionContext) {
@@ -41,7 +46,12 @@ export class CommonAuthGuard implements CanActivate {
 				this.exceptionService.sendUnauthorizedException(RESPONSE_MESSAGES.UNAUTHORIZED)
 			}
 
-			const user = await this.sharedService.getUserFromDb(requiredGuard, decodedToken['payload']['email'])
+			// Get user from MongoDB based on guard type
+			let user: any = null
+			if (requiredGuard === 'ADMIN') {
+				user = await this.adminModel.findOne({ email: decodedToken['payload']['email'] }).exec()
+			}
+			
 			if (!user) {
 				this.exceptionService.sendUnauthorizedException(RESPONSE_MESSAGES.UNAUTHORIZED)
 			}

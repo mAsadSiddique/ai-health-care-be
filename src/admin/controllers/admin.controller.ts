@@ -65,7 +65,7 @@ export class AdminController {
     @GuardName(GuardsEnum.ADMIN)
     @UseGuards(CommonAuthGuard, RoleGuard)
     @Put('/block/toggle')
-    async blockAdminToggle(@Body('id', ParseIntPipe) id: number, @user() admin: Admin) {
+    async blockAdminToggle(@Body('id') id: string, @user() admin: Admin) {
         return await this.adminService.blockAdminToggle(id, admin)
     }
 

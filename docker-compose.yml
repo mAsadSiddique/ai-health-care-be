@@ -1,17 +1,42 @@
-version: "3.3"
+version: '3.8'
+
 services:
-  edl_be:
-    container_name: edl_be
-    build:
-      dockerfile: Dockerfile
-      context: .
-      # Only will build development stage from our dockerfile
-      # target: development
-    volumes:
-      - .:/usr/src/app
-    env_file:
-      - .env
-      # Run a command against the development stage of the image
-      # command: npm run start:dev
+  mongodb:
+    image: mongo:7.0
+    container_name: ai-health-care-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: ai-health-care
     ports:
-      - 3001:3000
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - ai-health-care-network
+
+  mongo-express:
+    image: mongo-express:1.0.0
+    container_name: ai-health-care-mongo-express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb
+    networks:
+      - ai-health-care-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  ai-health-care-network:
+    driver: bridge

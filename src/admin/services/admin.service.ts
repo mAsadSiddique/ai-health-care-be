@@ -1,12 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 import { ExceptionService } from '../../shared/exception.service'
-import { FindOptionsWhere, ILike, Repository } from 'typeorm'
 import { LoginDTO } from '../../shared/dto/login.dto'
 import { SharedService } from '../../shared/shared.service'
 import { AddAdminDTO } from '../dtos/add_admin.dto'
 import { RESPONSE_MESSAGES } from '../../utils/enums/response_messages.enum'
-import { Admin } from '../entities/admin.entity'
+import { Admin, AdminDocument } from '../entities/admin.entity'
 import { GuardsEnum } from '../../utils/enums/guards.enum'
 import { Mailer } from '../../utils/mailer/mailer'
 import { SetPasswordDTO } from '../dtos/set_password.dto'
@@ -28,15 +28,15 @@ export class AdminService {
     private readonly logger = new Logger(AdminService.name)
     constructor(
         @Inject(CACHE_MANAGER) private accountVerificationCache: any,
-        @InjectRepository(Admin)
-        private readonly adminRepo: Repository<Admin>,
+        @InjectModel(Admin.name)
+        private readonly adminModel: Model<AdminDocument>,
         private readonly exceptionService: ExceptionService,
         private readonly sharedService: SharedService
     ) { }
 
     async login(args: LoginDTO) {
         try {
-            const adminInDB = await this.adminRepo.findOneBy({ email: args.email })
+            const adminInDB = await this.adminModel.findOne({ email: args.email }).exec()
             if (!adminInDB) {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.ADMIN_NOT_FOUND)
             }
@@ -61,16 +61,17 @@ export class AdminService {
 
     async addAdmin(args: AddAdminDTO) {
         try {
-            const adminInDb = await this.adminRepo.findOneBy({ email: args.email })
+            const adminInDb = await this.adminModel.findOne({ email: args.email }).exec()
             if (adminInDb) {
                 this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.ADMIN_ALREADY_EXIST)
             }
             const admin: Admin = new Admin(args)
             admin['password'] = process.env.DEFAULT_PASSWORD
-            await this.adminRepo.insert(admin)
+            const newAdmin = new this.adminModel(admin)
+            await newAdmin.save()
             // Send Set password code (email or phone)
-            const msg = await this.sendSetPasswordCode(args, admin)
-            this.logger.log(`Set password code sent successfully for user ${admin.id}`, this.addAdmin.name)
+            const msg = await this.sendSetPasswordCode(args, newAdmin)
+            this.logger.log(`Set password code sent successfully for user ${newAdmin._id}`, this.addAdmin.name)
             return this.sharedService.sendResponse(msg)
         } catch (error) {
             this.sharedService.sendError(error, this.addAdmin.name)
@@ -85,7 +86,7 @@ export class AdminService {
             this.logger.debug(`Set Password code generated for admin : ${args.email}`)
             if (args.email) {
                 if (user.isEmailVerified) {
-                    this.logger.warn(`Admin email already verified: ${user.id}`)
+                    this.logger.warn(`Admin email already verified: ${user._id}`)
                     this.exceptionService.sendNotAcceptableException(RESPONSE_MESSAGES.ADMIN_EMAIL_ALREADY_VERIFIED)
                 }
                 if (await this.accountVerificationCache.get(`setPassword${args.email}`)) {
@@ -110,12 +111,12 @@ export class AdminService {
 
     async resendEmail(args: ResendEmailDTO) {
         try {
-            const admin = await this.adminRepo.findOneBy({ email: args.email })
+            const admin = await this.adminModel.findOne({ email: args.email }).exec()
             if (!admin) this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.ADMIN_NOT_FOUND)
 
             // Resend Set password code (email or phone)
             const msg = await this.sendSetPasswordCode(args, admin)
-            this.logger.log(`Verification code sent successfully for user ${admin.id}`, this.addAdmin.name)
+            this.logger.log(`Verification code sent successfully for user ${admin._id}`, this.addAdmin.name)
             return this.sharedService.sendResponse(msg)
         } catch (error) {
             this.sharedService.sendError(error, this.resendEmail.name)
@@ -128,13 +129,13 @@ export class AdminService {
             if (args.email)
                 await this.verifyAccountCode(`setPassword${args.email}`, args.code)
 
-            admin = await this.adminRepo.findOneBy({ email: args.email })
+            admin = await this.adminModel.findOne({ email: args.email }).exec()
             if (admin.password !== process.env.DEFAULT_PASSWORD) {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.PASSWORD_ALREADY_SET)
             }
             admin.password = this.sharedService.hashedPassword(args.password)
             admin.isEmailVerified = true
-            await this.adminRepo.update(admin.id, { password: admin.password, isEmailVerified: admin.isEmailVerified })
+            await this.adminModel.updateOne({ _id: admin._id }, { password: admin.password, isEmailVerified: admin.isEmailVerified })
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.PASSWORD_SET)
         } catch (error) {
             this.sharedService.sendError(error, this.setPassword.name)
@@ -166,11 +167,7 @@ export class AdminService {
     async forgotPassword(args: ForgotPasswordDTO) {
         try {
             this.logger.log(`Forgot password request for: ${args.email}`, this.forgotPassword.name)
-            const admin: Admin = await this.adminRepo.findOne({
-                where: {
-                    email: args.email,
-                },
-            })
+            const admin: Admin = await this.adminModel.findOne({ email: args.email }).exec()
             if (!admin) {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.ADMIN_NOT_FOUND)
             }
@@ -222,11 +219,7 @@ export class AdminService {
         try {
             this.logger.log('Processing password reset request')
             this.sharedService.passwordsVerificatoin(args.password, args.confirmPassword)
-            const admin = await this.adminRepo.findOne({
-                where: {
-                    email: args.email,
-                },
-            })
+            const admin = await this.adminModel.findOne({ email: args.email }).exec()
             if (!admin) {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.ADMIN_NOT_FOUND)
             }
@@ -235,7 +228,7 @@ export class AdminService {
             await this.verifyAccountCode(`resetPassword${args.email}`, args.code)
             this.logger.debug('Email verification code to reset password validated successfully', this.resetPassword.name)
             admin.password = this.sharedService.hashedPassword(args.password)
-            await this.adminRepo.update(admin.id, { password: admin.password })
+            await this.adminModel.updateOne({ _id: admin._id }, { password: admin.password })
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.PASS_CHANGED_SUCCESSFULLY)
         } catch (error) {
             this.sharedService.sendError(error, this.resetPassword.name)
@@ -251,28 +244,23 @@ export class AdminService {
             this.sharedService.passwordsVerificatoin(args.password, args.confirmPassword)
             const hashedPass = this.sharedService.hashedPassword(args.password)
             admin.password = hashedPass
-            await this.adminRepo.update(admin.id, { password: admin.password })
+            await this.adminModel.updateOne({ _id: admin._id }, { password: admin.password })
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.PASS_CHANGED_SUCCESSFULLY)
         } catch (error) {
             this.sharedService.sendError(error, this.changePassword.name)
         }
     }
 
-    async blockAdminToggle(id: number, admin: Admin) {
+    async blockAdminToggle(id: string, admin: Admin) {
         try {
-            if (!isPositive(id)) {
-                this.exceptionService.sendUnprocessableEntityException(RESPONSE_MESSAGES.ID_MUST_BE_POSITIVE_NUMMER)
-            }
-            if (id === admin.id) {
+            if (id === admin._id.toString()) {
                 this.exceptionService.sendUnprocessableEntityException(RESPONSE_MESSAGES.SELF_BLOCKING_NOT_ALLOWED)
             }
-            const adminInDB = await this.adminRepo.findOne({
-                where: { id },
-            })
+            const adminInDB = await this.adminModel.findById(id).exec()
             if (!adminInDB) {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.ADMIN_NOT_FOUND)
             }
-            await this.adminRepo.update(id, { isBlocked: !adminInDB.isBlocked })
+            await this.adminModel.updateOne({ _id: id }, { isBlocked: !adminInDB.isBlocked })
             const msg = adminInDB.isBlocked ? RESPONSE_MESSAGES.ADMIN_UNBLOCKED : RESPONSE_MESSAGES.ADMIN_BLOCKED
             return this.sharedService.sendResponse(msg)
         } catch (error) {
@@ -292,7 +280,7 @@ export class AdminService {
     async editProfile(args: EditProfileDTO, admin: Admin) {
         try {
             Object.assign(admin, args)
-            await this.adminRepo.update({ id: admin.id }, admin)
+            await this.adminModel.updateOne({ _id: admin._id }, admin)
             const data = await this.getProfile(admin)
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.PROFILE_UPDATED, data)
         } catch (error) {
@@ -302,17 +290,15 @@ export class AdminService {
 
     async updateAdminRole(args: UpdateAdminRoleDTO, admin: Admin) {
         try {
-            if (args.id === admin.id) {
+            if (args.id === admin._id.toString()) {
                 this.exceptionService.sendUnprocessableEntityException(RESPONSE_MESSAGES.SELF_UPDATION_NOT_ALLOWED)
             }
-            const adminMember = await this.adminRepo.findOne({
-                where: { id: args.id }
-            })
+            const adminMember = await this.adminModel.findById(args.id).exec()
             if (!adminMember) {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.ADMIN_NOT_FOUND)
             }
             adminMember.role = args.role
-            await this.adminRepo.update({ id: adminMember.id }, { role: adminMember.role })
+            await this.adminModel.updateOne({ _id: adminMember._id }, { role: adminMember.role })
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.ROLE_UPDATED, { admin: adminMember })
         } catch (error) {
             this.sharedService.sendError(error, this.updateAdminRole.name)
@@ -321,32 +307,36 @@ export class AdminService {
 
     async adminsListing(args: AdminListingDTO) {
         try {
-            let whereClause: FindOptionsWhere<Admin> | FindOptionsWhere<Admin>[] = {}
+            let query: any = {}
             if (args.hasOwnProperty('isBlocked') && args.isBlocked !== undefined) {
-                whereClause['isBlocked'] = args.isBlocked
+                query['isBlocked'] = args.isBlocked
             }
             if (args.hasOwnProperty('isEmailVerified') && args.isEmailVerified !== undefined) {
-                whereClause['isEmailVerified'] = args.isEmailVerified
+                query['isEmailVerified'] = args.isEmailVerified
             }
             if (args.id) {
-                whereClause['id'] = args.id
+                query['_id'] = args.id
             }
             if (args.role) {
-                whereClause['role'] = args.role
+                query['role'] = args.role
             }
             if (args.search) {
-                whereClause = [
-                    { ...whereClause, firstName: ILike(`%${args.search}%`) },
-                    { ...whereClause, lastName: ILike(`%${args.search}%`) },
-                    { ...whereClause, email: ILike(`%${args.search}%`) }
+                query['$or'] = [
+                    { firstName: { $regex: args.search, $options: 'i' } },
+                    { lastName: { $regex: args.search, $options: 'i' } },
+                    { email: { $regex: args.search, $options: 'i' } }
                 ]
             }
-            const [admins, count] = await this.adminRepo.findAndCount({
-                where: whereClause,
-                skip: args.pageNumber * args.pageSize,
-                take: args.pageSize,
-                order: { 'id': 'DESC' }
-            })
+            
+            const skip = args.pageNumber * args.pageSize
+            const admins = await this.adminModel.find(query)
+                .skip(skip)
+                .limit(args.pageSize)
+                .sort({ _id: -1 })
+                .exec()
+            
+            const count = await this.adminModel.countDocuments(query).exec()
+            
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.ADMIN_LISTING, { count, admins })
         } catch (error) {
             this.sharedService.sendError(error, this.adminsListing.name)

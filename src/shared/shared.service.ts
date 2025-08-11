@@ -7,7 +7,7 @@ import * as crypto from 'crypto'
 import { RESPONSE_MESSAGES } from '../utils/enums/response_messages.enum'
 import { PreviewableFileType } from '../utils/types/previewable_file.type'
 import { ObjectType } from '../utils/types/generic_types.type'
-import { Between, DataSource, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
+
 import { BucketParamType } from 'src/utils/types/bucket-param.type'
 import { RevenueDto } from './dto/revenue_filters.dto'
 
@@ -17,8 +17,7 @@ export class SharedService {
 	private readonly s3 = getWasabiS3Object()
 
 	constructor(
-		private readonly exceptionService: ExceptionService,
-		private readonly dataSource: DataSource) { }
+		private readonly exceptionService: ExceptionService) { }
 
 	/**
 	 * @description send response to client
@@ -455,14 +454,7 @@ export class SharedService {
 		}
 	}
 
-	async getUserFromDb(entity: string, email: string) {
-		try {
-			const repo = this.dataSource.getRepository(entity)
-			return await repo.findOne({ where: { email } })
-		} catch (error) {
-			this.sendError(error, this.getUserFromDb.name)
-		}
-	}
+
 
 	bcryptCompareVerificatoin(password: string, userInput: string) {
 		try {
@@ -528,25 +520,20 @@ export class SharedService {
 		}
 	}
 
-	appendDateFilterQuery(args: any, entityAlias: string, query: any) {
+	appendDateFilterQuery(args: any, query: any) {
 		try {
-
 			if (args.fromDate && args.toDate) {
 				if (args.fromDate > args.toDate) {
 					this.exceptionService.sendUnprocessableEntityException(RESPONSE_MESSAGES.FROM_DATE_MUST_BE_GREATER_THAN_TO_DATE)
 				}
-				query.andWhere(`${entityAlias}.createdAt BETWEEN :fromDate AND :toDate`, {
-					fromDate: new Date(args.fromDate),
-					toDate: new Date(new Date(args.toDate).setDate(new Date(args.toDate).getDate() + 1))
-				})
+				query['createdAt'] = {
+					$gte: new Date(args.fromDate),
+					$lte: new Date(new Date(args.toDate).setDate(new Date(args.toDate).getDate() + 1))
+				}
 			} else if (args.fromDate) {
-				query.andWhere(`${entityAlias}.createdAt >= :fromDate`, {
-					fromDate: new Date(args.fromDate)
-				})
+				query['createdAt'] = { $gte: new Date(args.fromDate) }
 			} else if (args.toDate) {
-				query.andWhere(`${entityAlias}.createdAt <= :toDate`, {
-					toDate: new Date(new Date(args.toDate).setDate(new Date(args.toDate).getDate() + 1))
-				})
+				query['createdAt'] = { $lte: new Date(new Date(args.toDate).setDate(new Date(args.toDate).getDate() + 1)) }
 			}
 		} catch (error) {
 			this.sendError(error, this.appendDateFilterQuery.name)
@@ -560,11 +547,14 @@ export class SharedService {
 					this.exceptionService.sendUnprocessableEntityException(RESPONSE_MESSAGES.FROM_DATE_MUST_BE_GREATER_THAN_TO_DATE)
 				}
 
-				whereClause['createdAt'] = Between(new Date(args.fromDate), new Date(new Date(args.toDate).setDate(new Date(args.toDate).getDate() + 1)))
+				whereClause['createdAt'] = {
+					$gte: new Date(args.fromDate),
+					$lte: new Date(new Date(args.toDate).setDate(new Date(args.toDate).getDate() + 1))
+				}
 			} else if (args.fromDate) {
-				whereClause['createdAt'] = MoreThanOrEqual(new Date(args.fromDate))
+				whereClause['createdAt'] = { $gte: new Date(args.fromDate) }
 			} else if (args.toDate) {
-				whereClause['createdAt'] = LessThanOrEqual(new Date(new Date(args.toDate).setDate(new Date(args.toDate).getDate() + 1)))
+				whereClause['createdAt'] = { $lte: new Date(new Date(args.toDate).setDate(new Date(args.toDate).getDate() + 1)) }
 			}
 		} catch (error) {
 			this.sendError(error, this.appendDateFilterCondition.name)

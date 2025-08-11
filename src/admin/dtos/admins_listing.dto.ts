@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer'
-import { IsBoolean, IsEnum, IsOptional, IsPositive, Length } from 'class-validator'
+import { IsBoolean, IsEnum, IsOptional, IsMongoId, Length } from 'class-validator'
 import { toBoolean } from '../../utils/utils'
 import { Roles } from '../../utils/enums/roles.enum'
 import { ApiPropertyOptional } from '@nestjs/swagger'
@@ -9,11 +9,11 @@ export class AdminListingDTO extends PaginationDTO {
 	@ApiPropertyOptional({
 		description: 'Search admin by id',
 		nullable: true,
-		example: 3,
+		example: '507f1f77bcf86cd799439011',
 	})
 	@IsOptional()
-	@IsPositive()
-	id: number
+	@IsMongoId()
+	id: string
 
 	@ApiPropertyOptional({
 		description: 'Search admins by role',

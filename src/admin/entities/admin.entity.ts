@@ -1,42 +1,44 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Document, Types } from 'mongoose'
 import { Roles } from '../../utils/enums/roles.enum'
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
-@Entity()
+export type AdminDocument = Admin & Document
+
+@Schema({ timestamps: true })
 export class Admin {
-	@PrimaryGeneratedColumn()
-	id: number
+	_id: Types.ObjectId
 
-	@Column({ unique: true })
+	@Prop({ required: true, unique: true })
 	email: string
 
-	@Column()
+	@Prop({ required: true })
 	password: string
 
-	@Column({ name: 'is_email_verified', default: false })
+	@Prop({ default: false })
 	isEmailVerified: boolean
 
-	@Column({ name: 'first_name', nullable: true })
+	@Prop()
 	firstName: string
 
-	@Column({ name: 'last_name', nullable: true })
+	@Prop()
 	lastName: string
 
-	@Column({ name: 'two_fa_auth', nullable: true })
+	@Prop()
 	twoFaAuth: string
 
-	@Column({ name: 'is_two_fa_enable', default: false })
+	@Prop({ default: false })
 	isTwoFaEnable: boolean
 
-	@Column({ name: 'is_blocked', default: false })
+	@Prop({ default: false })
 	isBlocked: boolean
 
-	@Column({ type: 'enum', enum: Roles })
+	@Prop({ type: String, enum: Roles, required: true })
 	role: Roles
 
-	@CreateDateColumn({ name: 'created_at' })
+	@Prop()
 	createdAt: Date
 
-	@UpdateDateColumn({ name: 'updated_at' })
+	@Prop()
 	updatedAt: Date
 
 	constructor(obj?) {
@@ -45,3 +47,5 @@ export class Admin {
 		}
 	}
 }
+
+export const AdminSchema = SchemaFactory.createForClass(Admin)

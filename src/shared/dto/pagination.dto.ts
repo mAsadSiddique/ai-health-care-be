@@ -4,11 +4,6 @@ import { IsOptional, IsPositive, Min } from 'class-validator'
 export class PaginationDTO {
 	@IsOptional()
 	@Type(() => Number)
-	@IsPositive()
-	id: number
-
-	@IsOptional()
-	@Type(() => Number)
 	@Min(0)
 	pageNumber = 0
 

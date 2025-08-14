@@ -21,6 +21,16 @@ export enum RESPONSE_MESSAGES {
 	PASS_CANT_SAME = `new and old password can't be same `,
 	ADMIN_EMAIL_ALREADY_VERIFIED = 'Admin email already verified successfully',
 
+	// Doctor
+	DOCTOR_ALREADY_EXIST = 'doctor already registered with this email',
+	DOCTOR_NOT_FOUND = 'doctor not found',
+	DOCTOR_BLOCKED = 'doctor blocked successfully',
+	DOCTOR_UNBLOCKED = 'doctor unblocked successfully',
+	DOCTOR_REGISTERED = 'doctor registered successfully. credentials sent to email',
+	DOCTOR_LISTING = 'doctors listed below',
+	DOCTOR_PROFILE_UPDATED = 'doctor profile updated successfully',
+	DOCTOR_EMAIL_ALREADY_VERIFIED = 'Doctor email already verified successfully',
+
 	// Email
 	EMAIL_ALREADY_VERIFIED = 'email already verified',
 	EMAIL_VERIFIED = 'email successfully verified',

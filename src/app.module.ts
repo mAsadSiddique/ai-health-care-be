@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { ConfigModule } from '@nestjs/config'
 import { AppService } from './app.service'
 import { AdminModule } from './admin/admin.module'
+import { DoctorModule } from './doctor/doctor.module'
 import * as dotenv from 'dotenv'
 import { ScheduleModule } from '@nestjs/schedule'
 import { CacheModule } from '@nestjs/cache-manager'
@@ -21,6 +22,7 @@ dotenv.config()
 			max: 100, // Optional: Maximum number of items in cache
 		}),
 		AdminModule,
+		DoctorModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

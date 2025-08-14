@@ -7,6 +7,7 @@ import { Reflector } from '@nestjs/core'
 import { GUARDS_KEY } from '../decorators/guards.decorator'
 import { RESPONSE_MESSAGES } from '../../utils/enums/response_messages.enum'
 import { Admin, AdminDocument } from '../../admin/entities/admin.entity'
+import { Doctor, DoctorDocument } from '../../doctor/entities/doctor.entity'
 
 @Injectable()
 export class CommonAuthGuard implements CanActivate {
@@ -15,7 +16,9 @@ export class CommonAuthGuard implements CanActivate {
 		private readonly exceptionService: ExceptionService,
 		private readonly sharedService: SharedService,
 		@InjectModel(Admin.name)
-		private readonly adminModel: Model<AdminDocument>
+		private readonly adminModel: Model<AdminDocument>,
+		@InjectModel(Doctor.name)
+		private readonly doctorModel?: Model<DoctorDocument>
 	) {}
 
 	async canActivate(context: ExecutionContext) {
@@ -50,6 +53,11 @@ export class CommonAuthGuard implements CanActivate {
 			let user: any = null
 			if (requiredGuard === 'ADMIN') {
 				user = await this.adminModel.findOne({ email: decodedToken['payload']['email'] }).exec()
+			} else if (requiredGuard === 'DOCTOR') {
+				if (!this.doctorModel) {
+					this.exceptionService.sendInternalServerErrorException('Doctor model not available')
+				}
+				user = await this.doctorModel.findOne({ email: decodedToken['payload']['email'] }).exec()
 			}
 			
 			if (!user) {

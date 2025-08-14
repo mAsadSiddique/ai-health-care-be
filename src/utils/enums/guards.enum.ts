@@ -1,3 +1,4 @@
 export enum GuardsEnum {
-	ADMIN = 'Admin',
+	ADMIN = 'ADMIN',
+	DOCTOR = 'DOCTOR',
 }

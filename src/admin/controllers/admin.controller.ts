@@ -45,20 +45,6 @@ export class AdminController {
         return await this.adminService.addAdmin(args)
     }
 
-    @ApiOkResponse({ description: RESPONSE_MESSAGES.PASSWORD_SET })
-    @ApiNotAcceptableResponse({ description: RESPONSE_MESSAGES.PASSWORD_ALREADY_SET })
-    @Put('/set/password')
-    async setPassword(@Body() args: SetPasswordDTO) {
-        return await this.adminService.setPassword(args)
-    }
-
-    @ApiOkResponse({ description: RESPONSE_MESSAGES.EMAIL_RESEND })
-    @ApiNotAcceptableResponse({ description: RESPONSE_MESSAGES.EMAIL_ALREADY_VERIFIED })
-    @Post('/resend/email')
-    async resendEmailForSetPassword(@Body() args: ResendEmailDTO) {
-        return this.adminService.resendEmail(args)
-    }
-
     @ApiOkResponse({ description: 'admin block/unblock successfully' })
     @ApiNotFoundResponse({ description: RESPONSE_MESSAGES.ADMIN_NOT_FOUND })
     @Role(Roles.SUPER)

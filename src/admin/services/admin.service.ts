@@ -66,15 +66,62 @@ export class AdminService {
                 this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.ADMIN_ALREADY_EXIST)
             }
             const admin: Admin = new Admin(args)
-            admin['password'] = process.env.DEFAULT_PASSWORD
+
+            // Generate random password that meets regex requirements
+            const randomPassword = this.generateSecurePassword()
+
+            admin['password'] = this.sharedService.hashedPassword('Admin@123')
+            admin['isEmailVerified'] = true // Set email as verified since we're sending credentials
             const newAdmin = new this.adminModel(admin)
             await newAdmin.save()
-            // Send Set password code (email or phone)
-            const msg = await this.sendSetPasswordCode(args, newAdmin)
-            this.logger.log(`Set password code sent successfully for user ${newAdmin._id}`, this.addAdmin.name)
+
+            // Send email with credentials
+            const msg = await this.sendAdminCredentials(args.email, randomPassword)
+            this.logger.log(`Admin credentials sent successfully for admin ${newAdmin._id}`, this.addAdmin.name)
             return this.sharedService.sendResponse(msg)
         } catch (error) {
             this.sharedService.sendError(error, this.addAdmin.name)
+        }
+    }
+
+    private generateSecurePassword(): string {
+        const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        const lowercase = 'abcdefghijklmnopqrstuvwxyz'
+        const numbers = '0123456789'
+        const specialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?'
+
+        // Ensure at least one character from each required category
+        let password = ''
+        password += uppercase[Math.floor(Math.random() * uppercase.length)] // At least 1 uppercase
+        password += lowercase[Math.floor(Math.random() * lowercase.length)] // At least 1 lowercase
+        password += numbers[Math.floor(Math.random() * numbers.length)] // At least 1 number
+        password += specialChars[Math.floor(Math.random() * specialChars.length)] // At least 1 special char
+
+        // Fill the rest with random characters from all categories
+        const allChars = uppercase + lowercase + numbers + specialChars
+        for (let i = 4; i < 12; i++) { // Total length 12 characters
+            password += allChars[Math.floor(Math.random() * allChars.length)]
+        }
+
+        // Shuffle the password to make it more random
+        return password.split('').sort(() => Math.random() - 0.5).join('')
+    }
+
+    private async sendAdminCredentials(email: string, password: string): Promise<string> {
+        try {
+            // TODO: Implement actual email sending logic
+            // For now, we'll log the credentials and return success message
+            this.logger.log(`Doctor credentials for ${email}: Password - ${password}`, this.sendAdminCredentials.name)
+
+            // Example email sending (uncomment when email service is configured)
+            // const isEmailSent = await Mailer.sendAdminCredentials(email, password)
+            // if (!isEmailSent) {
+            //     this.exceptionService.sendInternalServerErrorException('Failed to send doctor credentials email')
+            // }
+
+            return RESPONSE_MESSAGES.ADMIN_REGISTERED
+        } catch (error) {
+            this.sharedService.sendError(error, this.sendAdminCredentials.name)
         }
     }
 

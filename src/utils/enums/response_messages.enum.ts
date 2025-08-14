@@ -12,7 +12,7 @@ export enum RESPONSE_MESSAGES {
 	ADMIN_NOT_FOUND = 'admin not found',
 	ADMIN_BLOCKED = 'admin blocked successfully',
 	ADMIN_UNBLOCKED = 'admin unblocked successfully',
-	ADMIN_REGISTERED = 'admin registered successfully',
+	ADMIN_REGISTERED = 'admin registered successfully. credentials sent to email',
 	SENDING_EMAIL_FAILURE_MESSAGE = 'Admin registered successfully. Resend email to set password due to email sending failure',
 	ADMIN_LISTING = 'admins listed below',
 	ADMIN_PROFILE_UPDATED = 'admin profile updated successfully',

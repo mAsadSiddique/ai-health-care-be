@@ -20,6 +20,7 @@ import { UpdateAdminRoleDTO } from '../dtos/update_admin_role.dto'
 import { ForgotPasswordDTO } from 'src/shared/dto/forgot_password.dto'
 import { ChangePasswordDTO } from 'src/shared/dto/change_password.dto'
 import { ResetPasswordDTO } from '../dtos/reset_password.dto'
+import { IdDTO } from 'src/shared/dto/id.dto'
 
 @ApiTags('admin')
 @ApiBearerAuth('JWT')
@@ -51,7 +52,7 @@ export class AdminController {
     @GuardName(GuardsEnum.ADMIN)
     @UseGuards(CommonAuthGuard, RoleGuard)
     @Put('/block/toggle')
-    async blockAdminToggle(@Body('id') id: string, @user() admin: Admin) {
+    async blockAdminToggle(@Body() { id }: IdDTO, @user() admin: Admin) {
         return await this.adminService.blockAdminToggle(id, admin)
     }
 

@@ -34,7 +34,7 @@ export class AdminService {
         try {
             const adminInDb = await this.userModel.findOne({ email: args.email }).exec()
             if (adminInDb) {
-                this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.ADMIN_ALREADY_EXIST)
+                this.exceptionService.sendForbiddenException(`${adminInDb.userType} ${RESPONSE_MESSAGES.ALREADY_EXIST}`)
             }
             const admin: User = new User(args)
 

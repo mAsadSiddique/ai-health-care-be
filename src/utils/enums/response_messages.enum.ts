@@ -12,6 +12,7 @@ export enum RESPONSE_MESSAGES {
 
 	// Admin
 	ADMIN_ALREADY_EXIST = 'admin already registered with this email',
+	ALREADY_EXIST = 'already registered with this email',
 	ADMIN_NOT_FOUND = 'admin not found',
 	ADMIN_BLOCKED = 'admin blocked successfully',
 	ADMIN_UNBLOCKED = 'admin unblocked successfully',

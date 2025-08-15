@@ -32,7 +32,7 @@ export class DoctorService {
         try {
             const doctorInDb = await this.userModel.findOne({ email: args.email }).exec()
             if (doctorInDb) {
-                this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.DOCTOR_ALREADY_EXIST)
+                this.exceptionService.sendForbiddenException(`${doctorInDb.userType} ${RESPONSE_MESSAGES.ALREADY_EXIST}`)
             }
 
             // Generate random password that meets regex requirements

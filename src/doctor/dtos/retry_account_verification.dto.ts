@@ -13,3 +13,4 @@ export class RetryAccountVerificationDTO {
     @Transform((email) => email.value.toLowerCase())
     email: string
 }
+

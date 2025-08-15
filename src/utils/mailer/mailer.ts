@@ -1,38 +1,72 @@
 import * as sgMail from '@sendgrid/mail'
 
 export class Mailer {
-	static async sendAdminSetPasswordMail(email: string, user: string, url: string): Promise<boolean> {
+	static async forgotPassword(email: string, name: string, code: string): Promise<boolean> {
 		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
 		const msg = {
 			to: email,
 			from: process.env.SUPPORT_SENDER_EMAIL,
-			templateId: 'd-76c940fea1304fb88b817327cc11194f', // TODO: Will be replaced with edl template id
-			dynamic_template_data: { url, user }, // These variables names should be same as defined in sendgrid template
-		}
-
-		try {
-			const data = await sgMail.send(msg)
-			console.log(`${this.sendAdminSetPasswordMail.name} is sent successfully:`, data)
-			return true
-		} catch (error) {
-			console.error(`${this.sendAdminSetPasswordMail.name} throwing error during sending email:`, JSON.stringify(error))
-			return false
-		}
-	}
-
-	static async forgotPassword(email: string, user: string, url: string): Promise<boolean> {
-		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
-		const msg = {
-			to: email,
-			from: process.env.SUPPORT_SENDER_EMAIL,
-			templateId: 'd-bd804778fc4943ffbb8fd135aaf6b069',// TODO: Will be replaced with edl template id
-			dynamic_template_data: { url, user },
+			templateId: 'd-1d717d7a8b024d38ada909d57343dfb4',
+			dynamic_template_data: {
+				name: name?.trim.length ? name : 'user',
+				code,
+				supportEmail: process.env.SUPPORT_EMAIL || 'support@healthcare.com',
+				securityEmail: process.env.SECURITY_EMAIL || 'security@healthcare.com'
+			},
 		}
 		try {
 			await sgMail.send(msg)
 			return true
 		} catch (error) {
 			console.log(JSON.stringify(error))
+			return false
+		}
+	}
+
+	static async sendAdminCredentials(email: string, name: string, password: string): Promise<boolean> {
+		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
+		const msg = {
+			to: email,
+			from: process.env.SUPPORT_SENDER_EMAIL,
+			templateId: 'd-2df7002668164ca2af47170328c393c5',
+			dynamic_template_data: {
+				name: name?.trim?.length ? name : 'Admin',
+				email,
+				password,
+				supportEmail: process.env.SUPPORT_EMAIL || 'support@healthcare.com',
+				securityEmail: process.env.SECURITY_EMAIL || 'security@healthcare.com',
+			},
+		}
+
+		try {
+			await sgMail.send(msg)
+			return true
+		} catch (error) {
+			console.error(`${this.sendAdminCredentials.name} throwing error during sending email:`, JSON.stringify(error))
+			return false
+		}
+	}
+
+	static async sendDoctorCredentials(email: string, name: string, password: string): Promise<boolean> {
+		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
+		const msg = {
+			to: email,
+			from: process.env.SUPPORT_SENDER_EMAIL,
+			templateId: 'd-fea36c94c0b4409ea6807e0a85e04cfc',
+			dynamic_template_data: {
+				name: name?.trim?.length ? name : 'Doctor',
+				email,
+				password,
+				supportEmail: process.env.SUPPORT_EMAIL || 'support@healthcare.com',
+				securityEmail: process.env.SECURITY_EMAIL || 'security@healthcare.com'
+			},
+		}
+
+		try {
+			await sgMail.send(msg)
+			return true
+		} catch (error) {
+			console.error(`${this.sendDoctorCredentials.name} throwing error during sending email:`, JSON.stringify(error))
 			return false
 		}
 	}

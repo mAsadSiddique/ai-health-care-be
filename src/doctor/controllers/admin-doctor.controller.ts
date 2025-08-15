@@ -9,10 +9,7 @@ import { GuardName } from '../../auth/decorators/guards.decorator'
 import { GuardsEnum } from '../../utils/enums/guards.enum'
 import { CommonAuthGuard } from '../../auth/guard/common-auth.guard'
 import { RoleGuard } from '../../auth/guard/roles-auth.guard'
-import { user } from '../../auth/decorators/user.decorator'
-import { Admin } from '../../admin/entities/admin.entity'
 import { DoctorsListingDTO } from '../dtos/doctors_listing.dto'
-import { IdDTO } from 'src/shared/dto/id.dto'
 
 @ApiTags('admin-doctor')
 @ApiBearerAuth('JWT')
@@ -30,16 +27,6 @@ export class AdminDoctorController {
     @Post('/add')
     async addDoctor(@Body() args: AddDoctorDTO) {
         return await this.doctorService.addDoctor(args)
-    }
-
-    @ApiOkResponse({ description: 'doctor block/unblock successfully' })
-    @ApiNotFoundResponse({ description: RESPONSE_MESSAGES.DOCTOR_NOT_FOUND })
-    @Role(Roles.SUPER)
-    @GuardName(GuardsEnum.ADMIN)
-    @UseGuards(CommonAuthGuard, RoleGuard)
-    @Put('/block/toggle')
-    async blockDoctorToggle(@Body() { id }: IdDTO, @user() admin: Admin) {
-        return await this.doctorService.blockDoctorToggle(id, admin)
     }
 
     @ApiOkResponse({ description: RESPONSE_MESSAGES.DOCTOR_LISTING })

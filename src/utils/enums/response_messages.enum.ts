@@ -6,6 +6,9 @@ export enum RESPONSE_MESSAGES {
 	USER_ALREADY_EXIST = 'user already registered with this email',
 	USER_NOT_FOUND = 'user not found',
 	USER_BLOCKED = 'you are blocked kindly contact to the support',
+	EMAIL_NOT_VERIFIED = 'email not verified',
+	INVALID_USER_TYPE = 'invalid user type',
+	USER_DELETED_SUCCESSFULLY = 'user deleted successfully',
 
 	// Admin
 	ADMIN_ALREADY_EXIST = 'admin already registered with this email',

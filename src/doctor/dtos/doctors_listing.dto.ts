@@ -64,3 +64,4 @@ export class DoctorsListingDTO extends IntersectionType(PaginationDTO, PartialTy
     @IsString()
     qualification?: string
 }
+

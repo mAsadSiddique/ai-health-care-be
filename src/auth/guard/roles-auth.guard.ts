@@ -4,7 +4,7 @@ import { ExceptionService } from '../../shared/exception.service'
 import { ROLES_KEY } from '../decorators/roles.decorator'
 import { Roles } from '../../utils/enums/roles.enum'
 import { SharedService } from '../../shared/shared.service'
-import { Admin } from '../../admin/entities/admin.entity'
+import { User } from '../../user/entities/user.entity'
 import { RESPONSE_MESSAGES } from '../../utils/enums/response_messages.enum'
 
 @Injectable()
@@ -26,8 +26,8 @@ export class RoleGuard implements CanActivate {
 			}
 
 			const req: any = context.switchToHttp().getRequest()
-			const admin: Admin = req.user
-			return requiredRoles.some((role) => admin.role?.includes(role))
+			const user: User = req.user
+			return requiredRoles.some((role) => user.role?.includes(role))
 		} catch (error) {
 			console.error('error in role guard: ', error.message)
 			this.sharedService.exceptionDetector(error)

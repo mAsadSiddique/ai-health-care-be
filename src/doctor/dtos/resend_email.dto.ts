@@ -13,3 +13,4 @@ export class ResendEmailDTO {
     @Transform((email) => email.value.toLowerCase())
     email: string
 }
+

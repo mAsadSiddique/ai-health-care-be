@@ -3,16 +3,14 @@ import { AdminDoctorController } from './controllers/admin-doctor.controller'
 import { DoctorController } from './controllers/doctor.controller'
 import { DoctorService } from './services/doctor.service'
 import { MongooseModule } from '@nestjs/mongoose'
-import { Doctor, DoctorSchema } from './entities/doctor.entity'
 import { SharedModule } from '../shared/shared.module'
 import { AuthModule } from '../auth/auth.module'
-import { Admin, AdminSchema } from 'src/admin/entities/admin.entity'
+import { User, UserSchema } from 'src/user/entities/user.entity'
 
 @Module({
     imports: [
         MongooseModule.forFeature([
-            { name: Doctor.name, schema: DoctorSchema },
-            { name: Admin.name, schema: AdminSchema }
+            { name: User.name, schema: UserSchema }
         ]),
         SharedModule,
         AuthModule

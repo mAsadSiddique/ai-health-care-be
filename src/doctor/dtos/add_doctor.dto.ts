@@ -89,3 +89,4 @@ export class AddDoctorDTO {
     @IsString()
     address: string
 }
+

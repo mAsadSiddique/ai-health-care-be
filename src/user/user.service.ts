@@ -199,8 +199,7 @@ export class UserService {
             Object.assign(user, args)
             await this.userModel.updateOne({ _id: user._id }, user)
 
-            const data = await this.getProfile(userId)
-            return this.sharedService.sendResponse(RESPONSE_MESSAGES.PROFILE_UPDATED, data)
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.PROFILE_UPDATED, user)
         } catch (error) {
             this.sharedService.sendError(error, this.editProfile.name)
         }

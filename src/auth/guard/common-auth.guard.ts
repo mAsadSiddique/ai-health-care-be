@@ -8,6 +8,7 @@ import { GUARDS_KEY } from '../decorators/guards.decorator'
 import { RESPONSE_MESSAGES } from '../../utils/enums/response_messages.enum'
 import { User, UserDocument } from '../../user/entities/user.entity'
 import { UserType } from '../../utils/enums/user-type.enum'
+import { GuardsEnum } from '../../utils/enums/guards.enum'
 
 @Injectable()
 export class CommonAuthGuard implements CanActivate {
@@ -21,6 +22,8 @@ export class CommonAuthGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext) {
 		const req: any = context.switchToHttp().getRequest()
+		const requiredGuard = this.reflector.get<string>(GUARDS_KEY, context.getHandler())
+
 		// Checking if token exists
 		if (!req.headers.authorization) {
 			this.exceptionService.sendUnauthorizedException(RESPONSE_MESSAGES.JWT_REQUIRED)
@@ -55,12 +58,33 @@ export class CommonAuthGuard implements CanActivate {
 				this.exceptionService.sendUnauthorizedException(RESPONSE_MESSAGES.USER_BLOCKED)
 			}
 
+			// Check if user type matches the required guard
+			if (requiredGuard) {
+				const requiredUserType = this.getRequiredUserType(requiredGuard)
+				if (user.userType !== requiredUserType) {
+					this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.ROLE_UNAUTHORIZE)
+				}
+			}
+
 			req.user = user
 			return true
 		} catch (error) {
 			console.error('error in auth guard: ', error.message)
 			this.sharedService.exceptionDetector(error)
 			this.sharedService.sendError(error, 'CommonAuthGuard')
+		}
+	}
+
+	private getRequiredUserType(guardName: string): UserType {
+		switch (guardName) {
+			case GuardsEnum.ADMIN:
+				return UserType.ADMIN
+			case GuardsEnum.DOCTOR:
+				return UserType.DOCTOR
+			case GuardsEnum.PATIENT:
+				return UserType.PATIENT
+			default:
+				throw new Error(`Unknown guard: ${guardName}`)
 		}
 	}
 }

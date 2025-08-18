@@ -70,4 +70,28 @@ export class Mailer {
 			return false
 		}
 	}
+
+	// TODO: needs to set patiend template email currently added doctor email template id
+	static async sendPatientCredentials(email: string, name: string, password: string): Promise<boolean> {
+		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
+		const msg = {
+			to: email,
+			from: process.env.SUPPORT_SENDER_EMAIL,
+			templateId: 'd-fea36c94c0b4409ea6807e0a85e04cfc', // Using same template as doctor for now
+			dynamic_template_data: {
+				name: name?.trim?.length ? name : 'Patient',
+				email,
+				password,
+				supportEmail: process.env.SUPPORT_EMAIL || 'support@healthcare.com',
+				securityEmail: process.env.SECURITY_EMAIL || 'security@healthcare.com'
+			},
+		}
+		try {
+			await sgMail.send(msg)
+			return true
+		} catch (error) {
+			console.error(`${this.sendPatientCredentials.name} throwing error during sending email:`, JSON.stringify(error))
+			return false
+		}
+	}
 }

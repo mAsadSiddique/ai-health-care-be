@@ -1,10 +1,47 @@
-import { Transform } from 'class-transformer'
-import { IsOptional, Length, IsString, IsNumber, Min, Max } from 'class-validator'
-import { ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
+import { IsOptional, Length, IsString, IsNumber, Min, Max, IsNotEmpty, IsInt, ValidateNested, IsEnum } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { GenderEnum } from 'src/utils/enums/gender.enum'
+import { CurrencyEnum } from 'src/utils/enums/user-type.enum'
+
+class UserDobDTO {
+    @ApiProperty({ description: 'Day of birth', type: Number, minimum: 1, maximum: 31, example: 25 })
+    @IsNotEmpty()
+    @IsInt()
+    @Min(1)
+    @Max(31)
+    day!: number
+
+    @ApiProperty({ description: 'Month of birth', type: Number, minimum: 1, maximum: 12, example: 11 })
+    @IsNotEmpty()
+    @IsInt()
+    @Min(1)
+    @Max(12)
+    month!: number
+
+    @ApiProperty({ description: 'Year of birth', type: Number, minimum: 1900, maximum: 2100, example: 2005 })
+    @IsNotEmpty()
+    @IsInt()
+    @Min(1950)
+    @Max(new Date().getFullYear())
+    year!: number
+}
+
+class DoctorSalaryDTO {
+    @ApiProperty({ description: 'Salary', type: Number, example: 100000 })
+    @IsNotEmpty()
+    @IsNumber()
+    salary!: number
+
+    @ApiProperty({ description: 'Currency', type: String, example: 'USD' })
+    @IsNotEmpty()
+    @IsEnum(CurrencyEnum)
+    currency!: CurrencyEnum
+}
 
 export class EditProfileDTO {
     @ApiPropertyOptional({
-        description: "Doctor's first name",
+        description: "First name",
         nullable: true,
         example: 'John',
     })
@@ -14,7 +51,7 @@ export class EditProfileDTO {
     firstName: string
 
     @ApiPropertyOptional({
-        description: "Doctor's last name",
+        description: "Last name",
         nullable: true,
         example: 'Doe',
     })
@@ -24,7 +61,7 @@ export class EditProfileDTO {
     lastName: string
 
     @ApiPropertyOptional({
-        description: "Doctor's phone number",
+        description: "Phone number",
         nullable: true,
         example: '+1234567890',
     })
@@ -71,12 +108,53 @@ export class EditProfileDTO {
     qualification: string
 
     @ApiPropertyOptional({
-        description: "Doctor's address",
+        description: "Address",
         nullable: true,
         example: '123 Medical Center Dr, City, State',
     })
     @IsOptional()
     @IsString()
     address: string
+
+    @ApiPropertyOptional({
+        description: "Doctor's salary",
+        nullable: true,
+        example: {
+            salary: 100000,
+            currency: 'USD',
+        },
+    })
+    @IsOptional()
+    @ValidateNested({ each: true })
+    @Type(() => DoctorSalaryDTO)
+    salary: DoctorSalaryDTO
+
+    @ApiPropertyOptional({
+        description: 'Enter the user date of birth',
+        type: UserDobDTO,
+        nullable: true,
+    })
+    @IsOptional()
+    @ValidateNested({ each: true })
+    @Type(() => UserDobDTO)
+    dateOfBirth!: UserDobDTO
+
+    @ApiPropertyOptional({
+        description: 'Enter the user gender',
+        type: String,
+        nullable: true,
+    })
+    @IsOptional()
+    @IsEnum(GenderEnum)
+    gender: GenderEnum
+
+    @ApiPropertyOptional({
+        description: 'Enter the user emergency contact',
+        type: String,
+        nullable: true,
+    })
+    @IsOptional()
+    @IsString()
+    emergencyContact: string
 }
 

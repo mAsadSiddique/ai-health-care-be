@@ -2,6 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, Types } from 'mongoose'
 import { UserType } from '../../utils/enums/user-type.enum'
 import { Roles } from '../../utils/enums/roles.enum'
+import { GenderEnum } from 'src/utils/enums/gender.enum'
+import { UserDobType } from 'src/utils/enums/dob.type'
+import { DoctorSalaryType } from 'src/utils/types/doctor.types'
 
 export type UserDocument = User & Document
 
@@ -44,6 +47,9 @@ export class User {
     @Prop()
     experience: number
 
+    @Prop({ type: Object })
+    salary: DoctorSalaryType
+
     @Prop()
     qualification: string
 
@@ -51,11 +57,11 @@ export class User {
     address: string
 
     // Patient specific fields (for future use)
-    @Prop()
-    dateOfBirth: Date
+    @Prop({ type: Object })
+    dateOfBirth: UserDobType
 
-    @Prop()
-    gender: string
+    @Prop({ type: String, enum: GenderEnum })
+    gender: GenderEnum
 
     @Prop()
     emergencyContact: string
@@ -78,6 +84,10 @@ export class User {
 
     @Prop()
     deletedAt: Date
+
+    @Prop({ type: Types.ObjectId, ref: 'User' })
+    PatientDoctorId: Types.ObjectId;
+
 
     constructor(obj?) {
         if (obj) {

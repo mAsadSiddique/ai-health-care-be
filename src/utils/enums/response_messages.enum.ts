@@ -35,6 +35,12 @@ export enum RESPONSE_MESSAGES {
 	DOCTOR_PROFILE_UPDATED = 'doctor profile updated successfully',
 	DOCTOR_EMAIL_ALREADY_VERIFIED = 'Doctor email already verified successfully',
 
+	// Patient
+	PATIENT_REGISTERED = 'patient registered successfully. credentials sent to email',
+	PATIENT_NOT_FOUND = 'patient not found',
+	PATIENT_LISTING = 'patients listed below',
+	PATIENT_PROFILE_UPDATED = 'patient profile updated successfully',
+
 	// Email
 	EMAIL_ALREADY_VERIFIED = 'email already verified',
 	EMAIL_VERIFIED = 'email successfully verified',

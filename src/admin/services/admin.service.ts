@@ -168,12 +168,15 @@ export class AdminService {
             if (id === admin._id.toString()) {
                 this.exceptionService.sendUnprocessableEntityException(RESPONSE_MESSAGES.SELF_BLOCKING_NOT_ALLOWED)
             }
-            const adminInDB = await this.userModel.findById(id).exec()
-            if (!adminInDB) {
-                this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.ADMIN_NOT_FOUND)
+            const user = await this.userModel.findById(id).exec()
+            if (!user) {
+                this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.USER_NOT_FOUND)
             }
-            await this.userModel.updateOne({ _id: id }, { isBlocked: !adminInDB.isBlocked })
-            const msg = adminInDB.isBlocked ? RESPONSE_MESSAGES.ADMIN_UNBLOCKED : RESPONSE_MESSAGES.ADMIN_BLOCKED
+            if (user.userType === UserType.PATIENT) {
+                this.exceptionService.sendNotAcceptableException(`Action denied: Administrators cannot block patients.`)
+            }
+            await this.userModel.updateOne({ _id: id }, { isBlocked: !user.isBlocked })
+            const msg = user.isBlocked ? `${user.userType} unblocked successfully` : `${user.userType} blocked successfully`
             return this.sharedService.sendResponse(msg)
         } catch (error) {
             this.sharedService.sendError(error, this.blockAdminToggle.name)

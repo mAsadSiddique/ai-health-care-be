@@ -71,13 +71,12 @@ export class Mailer {
 		}
 	}
 
-	// TODO: needs to set patiend template email currently added doctor email template id
 	static async sendPatientCredentials(email: string, name: string, password: string): Promise<boolean> {
 		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
 		const msg = {
 			to: email,
 			from: process.env.SUPPORT_SENDER_EMAIL,
-			templateId: 'd-fea36c94c0b4409ea6807e0a85e04cfc', // Using same template as doctor for now
+			templateId: 'd-80ea5d503f1f4da89dc2b697ed391f45',
 			dynamic_template_data: {
 				name: name?.trim?.length ? name : 'Patient',
 				email,

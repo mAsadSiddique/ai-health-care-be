@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer'
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, Length } from 'class-validator'
+import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, Length, Max, Min } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Roles } from '../../utils/enums/roles.enum'
 
@@ -42,4 +42,15 @@ export class AddAdminDTO {
 	@IsNotEmpty()
 	@IsEnum(Roles)
 	role: Roles
+
+	@ApiPropertyOptional({
+		description: 'Enter the user age',
+		type: Number,
+		nullable: true,
+	})
+	@IsOptional()
+	@IsNumber()
+	@Min(0)
+	@Max(120)
+	age: number
 }

@@ -64,6 +64,9 @@ export class User {
     gender: GenderEnum
 
     @Prop()
+    age: number
+
+    @Prop()
     emergencyContact: string
 
     // Common fields

@@ -149,6 +149,17 @@ export class EditProfileDTO {
     gender: GenderEnum
 
     @ApiPropertyOptional({
+        description: 'Enter the user age',
+        type: Number,
+        nullable: true,
+    })
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    @Max(120)
+    age: number
+
+    @ApiPropertyOptional({
         description: 'Enter the user emergency contact',
         type: String,
         nullable: true,

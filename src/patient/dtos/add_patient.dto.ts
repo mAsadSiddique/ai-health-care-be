@@ -1,6 +1,6 @@
 import { Transform, Type } from 'class-transformer'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, Length, ValidateNested, IsInt, Min, Max } from 'class-validator'
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, Length, ValidateNested, IsInt, Min, Max, IsNumber } from 'class-validator'
 import { GenderEnum } from 'src/utils/enums/gender.enum'
 
 class UserDobDTO {
@@ -70,4 +70,15 @@ export class AddPatientDTO {
     @IsOptional()
     @IsString()
     emergencyContact?: string
+
+    @ApiPropertyOptional({
+        description: 'Enter the user age',
+        type: Number,
+        nullable: true,
+    })
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    @Max(120)
+    age: number
 }

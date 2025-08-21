@@ -11,7 +11,7 @@ import { PatientService } from '../services/patient.service'
 import { AddPatientDTO } from '../dtos/add_patient.dto'
 import { PatientsListingDTO } from 'src/patient/dtos/patients_listing.dto'
 import { IdDTO } from 'src/shared/dto/id.dto'
-import { EditProfileDTO } from 'src/doctor/dtos/edit_profile.dto'
+import { EditProfileDTO, UpdatePatientDTO } from 'src/doctor/dtos/edit_profile.dto'
 import { user } from 'src/auth/decorators/user.decorator'
 import { User } from 'src/user/entities/user.entity'
 
@@ -53,8 +53,8 @@ export class DoctorPatientController {
     @ApiNotFoundResponse({ description: RESPONSE_MESSAGES.USER_NOT_FOUND })
     @GuardName(GuardsEnum.DOCTOR)
     @UseGuards(CommonAuthGuard)
-    @Put('/:id')
-    async updatePatient(@Param() params: IdDTO, @Body() args: EditProfileDTO) {
-        return await this.patientService.updatePatientDetail(params.id, args)
+    @Put('/')
+    async updatePatient(@Body() args: UpdatePatientDTO) {
+        return await this.patientService.updatePatientDetail(args)
     }
 }

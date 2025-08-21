@@ -195,6 +195,7 @@ export class DoctorService {
     async doctorsListing(args: DoctorsListingDTO) {
         try {
             let query: any = { userType: UserType.DOCTOR }
+
             if (args.hasOwnProperty('isBlocked') && args.isBlocked !== undefined) {
                 query['isBlocked'] = args.isBlocked
             }

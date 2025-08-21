@@ -15,6 +15,8 @@ import { LoginDTO } from 'src/shared/dto/login.dto'
 import { ForgotPasswordDTO } from 'src/shared/dto/forgot_password.dto'
 import { ResetPasswordDTO } from 'src/admin/dtos/reset_password.dto'
 import { EditProfileDTO } from 'src/doctor/dtos/edit_profile.dto'
+import { DoctorsListingDTO } from 'src/doctor/dtos/doctors_listing.dto'
+import { UserListingDTO } from './dtos/user-listing.dto'
 
 @Injectable()
 export class UserService {
@@ -259,6 +261,59 @@ export class UserService {
             firstName: user.firstName,
             userType: user.userType,
             role: user.role,
+        }
+    }
+
+    async userListing(args: UserListingDTO) {
+        try {
+            let query: any = {}
+
+            if (args.userType) {
+                query['userType'] = args.userType
+            }
+
+            if (args.hasOwnProperty('isBlocked') && args.isBlocked !== undefined) {
+                query['isBlocked'] = args.isBlocked
+            }
+            if (args.hasOwnProperty('isEmailVerified') && args.isEmailVerified !== undefined) {
+                query['isEmailVerified'] = args.isEmailVerified
+            }
+            if (args.specialization) {
+                query['specialization'] = { $regex: args.specialization, $options: 'i' }
+            }
+            if (args.qualification) {
+                query['qualification'] = { $regex: args.qualification, $options: 'i' }
+            }
+            if (args.minExperience !== undefined || args.maxExperience !== undefined) {
+                query['experience'] = {}
+                if (args.minExperience !== undefined) {
+                    query['experience']['$gte'] = args.minExperience
+                }
+                if (args.maxExperience !== undefined) {
+                    query['experience']['$lte'] = args.maxExperience
+                }
+            }
+            if (args.search) {
+                query['$or'] = [
+                    { firstName: { $regex: args.search, $options: 'i' } },
+                    { lastName: { $regex: args.search, $options: 'i' } },
+                    { email: { $regex: args.search, $options: 'i' } },
+                    { specialization: { $regex: args.search, $options: 'i' } }
+                ]
+            }
+
+            const skip = args.pageNumber * args.pageSize
+            const doctors = await this.userModel.find(query)
+                .skip(skip)
+                .limit(args.pageSize)
+                .sort({ _id: -1 })
+                .exec()
+
+            const count = await this.userModel.countDocuments(query).exec()
+
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.DOCTOR_LISTING, { count, doctors })
+        } catch (error) {
+            this.sharedService.sendError(error, this.userListing.name)
         }
     }
 }

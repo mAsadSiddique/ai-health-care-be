@@ -1,8 +1,9 @@
 import { Transform, Type } from 'class-transformer'
 import { IsOptional, Length, IsString, IsNumber, Min, Max, IsNotEmpty, IsInt, ValidateNested, IsEnum } from 'class-validator'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional, IntersectionType } from '@nestjs/swagger'
 import { GenderEnum } from 'src/utils/enums/gender.enum'
 import { CurrencyEnum } from 'src/utils/enums/user-type.enum'
+import { IdDTO } from 'src/shared/dto/id.dto'
 
 class UserDobDTO {
     @ApiProperty({ description: 'Day of birth', type: Number, minimum: 1, maximum: 31, example: 25 })
@@ -169,3 +170,4 @@ export class EditProfileDTO {
     emergencyContact: string
 }
 
+export class UpdatePatientDTO extends IntersectionType(IdDTO, EditProfileDTO) { }

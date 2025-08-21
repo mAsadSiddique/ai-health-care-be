@@ -5,6 +5,7 @@ import { User, UserSchema } from './entities/user.entity'
 import { UserService } from './user.service'
 import { UserController } from './user.controller'
 import { SharedModule } from '../shared/shared.module'
+import { AdminUserController } from './admin-user.controller'
 
 @Module({
     imports: [
@@ -17,7 +18,7 @@ import { SharedModule } from '../shared/shared.module'
         }),
         SharedModule,
     ],
-    controllers: [UserController],
+    controllers: [UserController, AdminUserController],
     providers: [UserService],
     exports: [UserService],
 })

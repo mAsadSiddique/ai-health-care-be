@@ -64,6 +64,9 @@ export class AdminController {
     }
 
     @ApiOkResponse({ description: RESPONSE_MESSAGES.ADMIN_LISTING })
+    @Role(Roles.SUPER, Roles.SUB)
+    @GuardName(GuardsEnum.ADMIN)
+    @UseGuards(CommonAuthGuard, RoleGuard)
     @Get('/')
     async adminListing(@Query() args: AdminListingDTO) {
         return await this.adminService.adminsListing(args)

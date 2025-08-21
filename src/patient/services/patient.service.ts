@@ -8,7 +8,7 @@ import { User, UserDocument } from '../../user/entities/user.entity'
 import { UserType } from '../../utils/enums/user-type.enum'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { PaginationDTO } from 'src/shared/dto/pagination.dto'
-import { EditProfileDTO } from 'src/doctor/dtos/edit_profile.dto'
+import { EditProfileDTO, UpdatePatientDTO } from 'src/doctor/dtos/edit_profile.dto'
 import { AddPatientDTO } from '../dtos/add_patient.dto'
 import { Mailer } from '../../utils/mailer/mailer'
 
@@ -93,9 +93,9 @@ export class PatientService {
         }
     }
 
-    async updatePatientDetail(id: string, args: EditProfileDTO) {
+    async updatePatientDetail(args: UpdatePatientDTO) {
         try {
-            const patient = await this.userModel.findOne({ _id: id, userType: UserType.PATIENT }).exec()
+            const patient = await this.userModel.findOne({ _id: args.id, userType: UserType.PATIENT }).exec()
             if (!patient) this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.USER_NOT_FOUND)
 
             Object.assign(patient, args)

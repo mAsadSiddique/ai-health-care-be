@@ -9,6 +9,7 @@ export enum RESPONSE_MESSAGES {
 	EMAIL_NOT_VERIFIED = 'email not verified',
 	INVALID_USER_TYPE = 'invalid user type',
 	USER_DELETED_SUCCESSFULLY = 'user deleted successfully',
+	USER_LISTING = 'users listed below',
 
 	// Admin
 	ADMIN_ALREADY_EXIST = 'admin already registered with this email',

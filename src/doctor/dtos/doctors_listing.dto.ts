@@ -1,8 +1,9 @@
 import { Transform } from 'class-transformer'
-import { IsOptional, IsString, IsBoolean, IsNumber, Min } from 'class-validator'
+import { IsOptional, IsString, IsBoolean, IsNumber, Min, IsEnum } from 'class-validator'
 import { ApiPropertyOptional, IntersectionType, PartialType } from '@nestjs/swagger'
 import { PaginationDTO } from '../../shared/dto/pagination.dto'
 import { IdDTO } from 'src/shared/dto/id.dto'
+import { UserType } from 'src/utils/enums/user-type.enum'
 
 export class DoctorsListingDTO extends IntersectionType(PaginationDTO, PartialType(IdDTO)) {
     @ApiPropertyOptional({

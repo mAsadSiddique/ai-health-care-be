@@ -23,7 +23,7 @@ export class AdminUserController {
     @GuardName(GuardsEnum.ADMIN)
     @UseGuards(CommonAuthGuard, RoleGuard)
     @Get('/')
-    async doctorListing(@Query() args: UserListingDTO) {
+    async userListing(@Query() args: UserListingDTO) {
         return await this.userService.userListing(args)
     }
 }

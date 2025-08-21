@@ -304,6 +304,13 @@ export class UserService {
 
             const skip = args.pageNumber * args.pageSize
             const doctors = await this.userModel.find(query)
+                .populate({
+                    path: 'analyzeData',
+                    options: { sort: { createdAt: -1 } }
+                })
+                .populate({
+                    path: 'PatientDoctorId',
+                })
                 .skip(skip)
                 .limit(args.pageSize)
                 .sort({ _id: -1 })

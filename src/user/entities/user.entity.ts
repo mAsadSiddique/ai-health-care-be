@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, Types } from 'mongoose'
+import { PatientAnalyzeData } from './patient_analyze_data.entity'
 import { UserType } from '../../utils/enums/user-type.enum'
 import { Roles } from '../../utils/enums/roles.enum'
 import { GenderEnum } from 'src/utils/enums/gender.enum'
@@ -91,7 +92,6 @@ export class User {
     @Prop({ type: Types.ObjectId, ref: 'User' })
     PatientDoctorId: Types.ObjectId;
 
-
     constructor(obj?) {
         if (obj) {
             Object.assign(this, obj)
@@ -100,4 +100,16 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
+
+// Enable virtuals in JSON/object output
+UserSchema.set('toJSON', { virtuals: true })
+UserSchema.set('toObject', { virtuals: true })
+
+// Virtual relation: User (one) -> PatientAnalyzeData (many)
+UserSchema.virtual('analyzeData', {
+    ref: PatientAnalyzeData.name,
+    localField: '_id',
+    foreignField: 'patientId',
+    justOne: false,
+})
 

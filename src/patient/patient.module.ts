@@ -6,11 +6,13 @@ import { SharedModule } from '../shared/shared.module'
 import { AuthModule } from '../auth/auth.module'
 import { User, UserSchema } from 'src/user/entities/user.entity'
 import { DoctorPatientController } from './controllers/doctor.controller'
+import { PatientAnalyzeData, PatientAnalyzeDataSchema } from 'src/user/entities/patient_analyze_data.entity'
 
 @Module({
     imports: [
         MongooseModule.forFeature([
-            { name: User.name, schema: UserSchema }
+            { name: User.name, schema: UserSchema },
+            { name: PatientAnalyzeData.name, schema: PatientAnalyzeDataSchema }
         ]),
         SharedModule,
         AuthModule

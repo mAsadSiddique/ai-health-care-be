@@ -41,6 +41,7 @@ export enum RESPONSE_MESSAGES {
 	PATIENT_NOT_FOUND = 'patient not found',
 	PATIENT_LISTING = 'patients listed below',
 	PATIENT_PROFILE_UPDATED = 'patient profile updated successfully',
+	DATA_SAVED_SUCCESSFULLY = 'Analyzed data saved successfully',
 
 	// Email
 	EMAIL_ALREADY_VERIFIED = 'email already verified',
@@ -94,74 +95,9 @@ export enum RESPONSE_MESSAGES {
 	INVALID_CODE = 'The code you entered is invalid. Please check and try again.',
 	EMAIL_RESET_CODE_SENT = 'Reset password code sent to your email, please check your inbox',
 	EMAIL_UNVERIFIED = 'login to your account please verify your account. we have sent a verification code to your registered email',
-
-	//Clinic
-	CLINIC_REGISTERED = 'clinic registered successfully',
-	CLINIC_ALREADY_EXIST_WITH_EMAIL = 'clinic already exist with this email',
-	CLINIC_ALREADY_EXIST_WITH_PHONE_NUMBER = 'clinic already exist with this phone number',
-	CLINIC_ALREADY_EXIST_WITH_NAME = 'clinic already exist with this clinic name',
-	CLINIC_LISTING = 'clinics listed below',
-	CLINIC_DETAIL_UPDATED = 'clinic detail updated successfully',
-	CLINIC_NOT_FOUND = 'clinic not found',
-
 	// Role
 	ROLE_REQUIRED = 'actioner role is required for authentication',
 	ROLE_UNAUTHORIZE = 'you are not authorize to perform this action',
-
-	//Dentist
-	DENTIST_REGISTERED = 'dentist registered successfully',
-	DENTIST_ALREADY_EXIST_WITH_EMAIL = 'dentist already exist with this email',
-	DENTIST_ALREADY_EXIST_WITH_PHONE_NUMBER = 'dentist already exist with this phone number',
-	DENTIST_DETAIL_UPDATED = 'dentist detail updated successfully',
-	DENTIST_NOT_FOUND = 'dentist not found',
-	DENTIST_LISTING = 'dentist listed below',
-	DELIVERY_DATE_LATER_OR_EQUAL_TO_RECEIVED = "the delivery date must be equal to or later than the received date",
-
-	//Order
-	ORDER_ALREADY_EXIST_WITH_SLIP_NUM = 'order already exist with this slip number',
-	ORDER_ADDED = 'order added successfully',
-	ORDER_DELETED = 'order deleted successfully',
-	ORDER_LISTING = 'order listed below',
-	ORDER_DETAIL_UPDATED = 'order detail updated successfully',
-	ORDER_NOT_FOUND = 'order not found',
-	ORDER_STATUS_UPDATED = 'order status updated successfully',
-	ORDER_STATUS_UNCHANGED = 'the order already has the specified status',
-	ORDER_MOVED_BACK_TO_SUBMITTED = 'order moved back to submitted successfully',
-	ORDER_MOVED_IN_PROCESS = 'order moved to processing successfully',
-	ORDER_READY_TO_DELIVER = 'order is ready for delivery successfully',
-	ORDER_DELIVERED = 'order delivered successfully',
-	ONE_JAW_DETAIL_REQUIRED = 'atleast one jaw detail is required',
-	ONE_PARAMETER_IS_REQUIRED = 'atleast one parameter is required',
-	ORDERS_RECEIPT_GENERATED = 'orders receipt generated successfully',
-	PAID_AMOUNT_MUST_EQUAL_OR_LESS_THAN_TOTAL = 'paid amount should be equal to or less than the total amount',
-	DENTIST_ID_REQUIRED = 'dentist or clinic id is required to generate receipt',
-
-	//Balance
-	BALANCE_NOT_FOUNT = 'balance not fount by given id',
-	BALANCE_ADDED_SUCCESSFULLY = 'balance added successfully',
-	BALANCE_ALREADY_EXIST = 'debit transaction already exisy against this order id',
-	BALANCE_NOT_FOUND = 'balance not found',
-	BALANCE_UPDATED_SUCCESSFULLY = 'balance updated successfully',
-	BALANCE_RECORD = 'balance record',
-	BALANCES_DELETED_SUCCESSFULLY = 'balances deleted successfully',
-	BALANCES_RECEIPT_GENERATED = 'balances receipt generated successfully',
-
-	//Employee
-	EMPLOYEE_REGISTERED = 'employee registered successfully',
-	EMPLOYEE_ALREADY_EXIST_WITH_EMAIL = 'employee already exist with this email',
-	EMPLOYEE_ALREADY_EXIST_WITH_CNIC = 'employee already exist with this CNIC number',
-	EMPLOYEE_NOT_FOUND = 'employee not found',
-	EMPLOYEE_DETAIL_UPDATED = 'employee detail updated successfully',
-	EMPLOYEE_LISTING = 'employees listed below',
-	END_DATE_SHOULD_GREATER_THAN_START = 'the end date should be greater than the start date',
-
-	//Financial Tracker
-	TRANSACTION_ADDED = 'transaction added successfully',
-	TRANSACTION_DETAIL_UPDATED = 'transaction detail updated successfully',
-	TRANSACTION_NOT_FOUND = 'transaction not foud',
-	TRANSACTION_LISTING = 'transaction listed below',
-	REVENUE = 'revenue generated successfully',
-	GRAPH = 'graph generated successfully',
 
 	//salary Tracker
 	RECORD_ADDED = 'record added successfully',

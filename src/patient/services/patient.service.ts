@@ -11,6 +11,8 @@ import { PaginationDTO } from 'src/shared/dto/pagination.dto'
 import { EditProfileDTO, UpdatePatientDTO } from 'src/doctor/dtos/edit_profile.dto'
 import { AddPatientDTO } from '../dtos/add_patient.dto'
 import { Mailer } from '../../utils/mailer/mailer'
+import { AnalyzeDataDTO, DoctorAnalyzeDataDTO } from 'src/user/dtos/analyze_data.dto'
+import { PatientAnalyzeData, PatientAnalyzeDataDocument } from 'src/user/entities/patient_analyze_data.entity'
 
 @Injectable()
 export class PatientService {
@@ -20,6 +22,8 @@ export class PatientService {
         @Inject(CACHE_MANAGER) private accountVerificationCache: any,
         @InjectModel(User.name)
         private readonly userModel: Model<UserDocument>,
+        @InjectModel(PatientAnalyzeData.name)
+        private readonly patiendAnalyzeDataModel: Model<PatientAnalyzeDataDocument>,
         private readonly exceptionService: ExceptionService,
         private readonly sharedService: SharedService
     ) { }
@@ -142,6 +146,32 @@ export class PatientService {
             password += allChars[Math.floor(Math.random() * allChars.length)]
         }
         return password.split('').sort(() => Math.random() - 0.5).join('')
+    }
+
+    async patientAnalyze(args: DoctorAnalyzeDataDTO, doctor: User) {
+        try {
+            const patient = await this.userModel.findOne({ _id: args.patientId, userType: UserType.PATIENT }).exec()
+            if (!patient) this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.PATIENT_NOT_FOUND)
+
+            const analyzeData = new this.patiendAnalyzeDataModel(args)
+            analyzeData.patientId = patient._id
+            analyzeData.patientDoctorId = doctor._id
+            await analyzeData.save()
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY)
+        } catch (error) {
+            this.sharedService.sendError(error, this.patientAnalyze.name)
+        }
+    }
+
+    async patientAnalyzeItself(args: AnalyzeDataDTO, patient: User) {
+        try {
+            const analyzeData = new this.patiendAnalyzeDataModel(args)
+            analyzeData.patientId = patient._id
+            await analyzeData.save()
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY)
+        } catch (error) {
+            this.sharedService.sendError(error, this.patientAnalyzeItself.name)
+        }
     }
 }
 

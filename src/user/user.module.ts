@@ -6,11 +6,13 @@ import { UserService } from './user.service'
 import { UserController } from './user.controller'
 import { SharedModule } from '../shared/shared.module'
 import { AdminUserController } from './admin-user.controller'
+import { PatientAnalyzeData, PatientAnalyzeDataSchema } from './entities/patient_analyze_data.entity'
 
 @Module({
     imports: [
         MongooseModule.forFeature([
-            { name: User.name, schema: UserSchema }
+            { name: User.name, schema: UserSchema },
+            { name: PatientAnalyzeData.name, schema: PatientAnalyzeDataSchema }
         ]),
         CacheModule.register({
             ttl: 300000, // 5 minutes

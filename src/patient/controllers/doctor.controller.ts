@@ -14,6 +14,7 @@ import { IdDTO } from 'src/shared/dto/id.dto'
 import { EditProfileDTO, UpdatePatientDTO } from 'src/doctor/dtos/edit_profile.dto'
 import { user } from 'src/auth/decorators/user.decorator'
 import { User } from 'src/user/entities/user.entity'
+import { DoctorAnalyzeDataDTO } from 'src/user/dtos/analyze_data.dto'
 
 @ApiTags('doctor-patient')
 @ApiBearerAuth('JWT')
@@ -56,5 +57,14 @@ export class DoctorPatientController {
     @Put('/')
     async updatePatient(@Body() args: UpdatePatientDTO) {
         return await this.patientService.updatePatientDetail(args)
+    }
+
+    @ApiOkResponse({ description: RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY })
+    @ApiNotFoundResponse({ description: RESPONSE_MESSAGES.PATIENT_NOT_FOUND })
+    @GuardName(GuardsEnum.DOCTOR)
+    @UseGuards(CommonAuthGuard)
+    @Post('/analyze')
+    async patientAnalyze(@Body() args: DoctorAnalyzeDataDTO, @user() doctor: User) {
+        return await this.patientService.patientAnalyze(args, doctor)
     }
 }

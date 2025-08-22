@@ -250,7 +250,7 @@ export class UserService {
             if (!user) {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.USER_NOT_FOUND)
             }
-
+            user.password = undefined
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.SUCCESS, user)
         } catch (error) {
             this.sharedService.sendError(error, this.getProfile.name)

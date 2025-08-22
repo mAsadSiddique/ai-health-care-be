@@ -43,6 +43,7 @@ export enum RESPONSE_MESSAGES {
 	PATIENT_PROFILE_UPDATED = 'patient profile updated successfully',
 	DATA_SAVED_SUCCESSFULLY = 'Analyzed data saved successfully',
 	PATIENT_EMAIL_ALREADY_VERIFIED = 'Patient email already verified successfully',
+	ANALYZE_DATA_LISTING = 'analyze data listed below',
 
 	// Appointment
 	APPOINTMENT_BOOKED_SUCCESSFULLY = 'appointment booked successfully',

@@ -203,22 +203,12 @@ export class AppointmentService {
 
             const appointments = await this.appointmentModel
                 .find(query)
-                .populate('doctor', 'firstName lastName specialization doctorFee')
+                .populate('doctor')
                 .sort({ appointmentDateTime: -1 })
-                .skip((filters.pageNumber - 1) * filters.pageSize)
+                .skip((filters.pageNumber) * filters.pageSize)
                 .limit(filters.pageSize)
 
-            const total = await this.appointmentModel.countDocuments(query)
-
-            return this.sharedService.sendResponse(RESPONSE_MESSAGES.APPOINTMENT_LISTING, {
-                data: appointments,
-                pagination: {
-                    page: filters.pageNumber,
-                    limit: filters.pageSize,
-                    total,
-                    pages: Math.ceil(total / filters.pageSize),
-                },
-            })
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.APPOINTMENT_LISTING, appointments)
         } catch (error) {
             this.sharedService.sendError(error, this.getPatientAppointments.name)
         }
@@ -262,22 +252,12 @@ export class AppointmentService {
 
             const appointments = await this.appointmentModel
                 .find(query)
-                .populate('patient', 'firstName lastName email phoneNumber')
+                .populate('patient')
                 .sort({ appointmentDateTime: -1 })
-                .skip((filters.pageNumber - 1) * filters.pageSize)
+                .skip((filters.pageNumber) * filters.pageSize)
                 .limit(filters.pageSize)
 
-            const total = await this.appointmentModel.countDocuments(query)
-
-            return this.sharedService.sendResponse(RESPONSE_MESSAGES.APPOINTMENT_LISTING, {
-                data: appointments,
-                pagination: {
-                    page: filters.pageNumber,
-                    limit: filters.pageSize,
-                    total,
-                    pages: Math.ceil(total / filters.pageSize),
-                },
-            })
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.APPOINTMENT_LISTING, appointments)
         } catch (error) {
             this.sharedService.sendError(error, this.getDoctorAppointments.name)
         }
@@ -355,20 +335,10 @@ export class AppointmentService {
                 .populate('patient', 'firstName lastName email phoneNumber')
                 .populate('doctor', 'firstName lastName specialization doctorFee email')
                 .sort({ appointmentDateTime: -1 })
-                .skip((filters.pageNumber - 1) * filters.pageSize)
+                .skip((filters.pageNumber) * filters.pageSize)
                 .limit(filters.pageSize)
 
-            const total = await this.appointmentModel.countDocuments(query)
-
-            return this.sharedService.sendResponse(RESPONSE_MESSAGES.APPOINTMENT_LISTING, {
-                data: appointments,
-                pagination: {
-                    page: filters.pageNumber,
-                    limit: filters.pageSize,
-                    total,
-                    pages: Math.ceil(total / filters.pageSize),
-                },
-            })
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.APPOINTMENT_LISTING, appointments)
         } catch (error) {
             this.sharedService.sendError(error, this.getAllAppointments.name)
         }

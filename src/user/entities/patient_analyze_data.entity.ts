@@ -13,10 +13,10 @@ export class PatientAnalyzeData {
     @Prop({ type: Object, required: true })
     analyzingResult: any
 
-    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+    @Prop({ type: Types.ObjectId, ref: 'User' })
     patientDoctorId: Types.ObjectId;
 
-    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+    @Prop({ type: Types.ObjectId, ref: 'User' })
     patientId: Types.ObjectId;
 
     @Prop()

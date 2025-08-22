@@ -19,6 +19,7 @@ import { RetryAccountVerificationDTO } from 'src/admin/dtos/retry_account_verifi
 import * as randomString from 'randomstring'
 import { SignupDTO } from '../dtos/signup.dto'
 import { AccountVerificationDTO } from '../dtos/account_verification.dto'
+import { AnalyzeDataListingDTO } from '../dtos/analyze_data_listing.dto'
 
 @Injectable()
 export class PatientService {
@@ -268,7 +269,7 @@ export class PatientService {
             analyzeData.patientId = patient._id
             analyzeData.patientDoctorId = doctor._id
             await analyzeData.save()
-            return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY)
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY, analyzeData)
         } catch (error) {
             this.sharedService.sendError(error, this.patientAnalyze.name)
         }
@@ -279,7 +280,7 @@ export class PatientService {
             const analyzeData = new this.patiendAnalyzeDataModel(args)
             analyzeData.patientId = patient._id
             await analyzeData.save()
-            return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY)
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY, analyzeData)
         } catch (error) {
             this.sharedService.sendError(error, this.patientAnalyzeItself.name)
         }
@@ -329,5 +330,33 @@ export class PatientService {
             this.sharedService.sendError(error, this.verifyAccountCode.name)
         }
     }
+
+    async listAnalyzeData(filters: AnalyzeDataListingDTO, patient: User) {
+        try {
+            const query: any = {}
+
+            // Apply optional filters
+            if (filters.id) {
+                query._id = filters.id
+            }
+
+            if (filters.doctorId) {
+                query.patientDoctorId = filters.doctorId
+            }
+
+            const analyzeDataList = await this.patiendAnalyzeDataModel
+                .find(query)
+                .populate('patientDoctorId')
+                .populate('patientId')
+                .sort({ createdAt: -1 })
+                .skip((filters.pageNumber) * filters.pageSize)
+                .limit(filters.pageSize)
+
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.ANALYZE_DATA_LISTING, analyzeDataList)
+        } catch (error) {
+            this.sharedService.sendError(error, this.listAnalyzeData.name)
+        }
+    }
+
 }
 

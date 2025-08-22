@@ -1,10 +1,10 @@
 import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator'
-import { ApiProperty, IntersectionType } from '@nestjs/swagger'
+import { ApiProperty, IntersectionType, PartialType } from '@nestjs/swagger'
 import { AppointmentStatus } from '../../utils/enums/appointment-status.enum'
 import { PaginationDTO } from '../../shared/dto/pagination.dto'
 import { IdDTO } from 'src/shared/dto/id.dto'
 
-export class AppointmentsListingDTO extends IntersectionType(IdDTO, PaginationDTO) {
+export class AppointmentsListingDTO extends IntersectionType(PartialType(IdDTO), PaginationDTO) {
     @ApiProperty({ description: 'Filter by appointment status', enum: AppointmentStatus, required: false })
     @IsOptional()
     @IsEnum(AppointmentStatus)

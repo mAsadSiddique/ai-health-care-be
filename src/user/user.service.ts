@@ -251,8 +251,7 @@ export class UserService {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.USER_NOT_FOUND)
             }
 
-            const data = this.getProfileData(user)
-            return this.sharedService.sendResponse(RESPONSE_MESSAGES.SUCCESS, data)
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.SUCCESS, user)
         } catch (error) {
             this.sharedService.sendError(error, this.getProfile.name)
         }

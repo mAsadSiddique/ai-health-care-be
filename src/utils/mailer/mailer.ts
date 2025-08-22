@@ -23,6 +23,28 @@ export class Mailer {
 		}
 	}
 
+	static async sendEmailVerificationCode(email: string, name: string, code: string): Promise<boolean> {
+		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
+		const msg = {
+			to: email,
+			from: process.env.SUPPORT_SENDER_EMAIL,
+			templateId: 'd-db9728ea016940029cc560af37824199',
+			dynamic_template_data: {
+				name: name?.trim.length ? name : 'user',
+				code,
+				supportEmail: process.env.SUPPORT_EMAIL || 'support@healthcare.com',
+				securityEmail: process.env.SECURITY_EMAIL || 'security@healthcare.com'
+			},
+		}
+		try {
+			await sgMail.send(msg)
+			return true
+		} catch (error) {
+			console.log(JSON.stringify(error))
+			return false
+		}
+	}
+
 	static async sendAdminCredentials(email: string, name: string, password: string): Promise<boolean> {
 		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
 		const msg = {

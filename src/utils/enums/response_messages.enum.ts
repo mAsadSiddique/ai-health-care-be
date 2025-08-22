@@ -42,6 +42,8 @@ export enum RESPONSE_MESSAGES {
 	PATIENT_LISTING = 'patients listed below',
 	PATIENT_PROFILE_UPDATED = 'patient profile updated successfully',
 	DATA_SAVED_SUCCESSFULLY = 'Analyzed data saved successfully',
+	PATIENT_EMAIL_ALREADY_VERIFIED = 'Patient email already verified successfully',
+
 
 	// Email
 	EMAIL_ALREADY_VERIFIED = 'email already verified',
@@ -91,6 +93,7 @@ export enum RESPONSE_MESSAGES {
 	ID_MUST_BE_POSITIVE_NUMMER = 'id must be a positive number',
 	FROM_DATE_MUST_BE_GREATER_THAN_TO_DATE = 'From date must be greater than to date',
 	EMAIL_VERIFICATION_CODE_SENT = 'Verification code sent successfully. Please check your email to verify your account.',
+	VERIFICATION_CODE_FAILED = 'User registered, but we were unable to send the verification code. Please try resending the code.',
 	CODE_EXPIRED = 'Your code has expired. Please request a new code to continue.',
 	INVALID_CODE = 'The code you entered is invalid. Please check and try again.',
 	EMAIL_RESET_CODE_SENT = 'Reset password code sent to your email, please check your inbox',

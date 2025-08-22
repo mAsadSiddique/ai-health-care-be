@@ -13,6 +13,12 @@ import { AddPatientDTO } from '../dtos/add_patient.dto'
 import { Mailer } from '../../utils/mailer/mailer'
 import { AnalyzeDataDTO, DoctorAnalyzeDataDTO } from 'src/user/dtos/analyze_data.dto'
 import { PatientAnalyzeData, PatientAnalyzeDataDocument } from 'src/user/entities/patient_analyze_data.entity'
+import { SetPasswordDTO } from 'src/admin/dtos/set_password.dto'
+import { ResendEmailDTO } from 'src/admin/dtos/resend_email.dto'
+import { RetryAccountVerificationDTO } from 'src/admin/dtos/retry_account_verification.dto'
+import * as randomString from 'randomstring'
+import { SignupDTO } from '../dtos/signup.dto'
+import { AccountVerificationDTO } from '../dtos/account_verification.dto'
 
 @Injectable()
 export class PatientService {
@@ -61,6 +67,104 @@ export class PatientService {
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.PATIENT_REGISTERED)
         } catch (error) {
             this.sharedService.sendError(error, this.addPatient.name)
+        }
+    }
+
+    /**
+     * Register a new user
+     * @param args User signup data
+     * @returns Response with success message
+     */
+    async signup(args: SignupDTO) {
+        try {
+            this.logger.log(`Attempting to register user with email: ${args.email || 'N/A'} or phone: ${args.phoneNumber || 'N/A'}`)
+
+            // verify the password and confirm password are same
+            if (args.password !== args.confirmPassword) {
+                this.logger.warn('Password and confirm password do not match')
+                this.exceptionService.sendBadRequestException(RESPONSE_MESSAGES.PASSWORD_NOT_MATCHED)
+            }
+            // Check if user already exists
+            const patientInDb = await this.userModel.findOne({ email: args.email }).exec()
+            if (patientInDb) {
+                this.exceptionService.sendForbiddenException(`Patient ${RESPONSE_MESSAGES.ALREADY_EXIST}`)
+            }
+            const patient: User = new User({
+                ...args,
+                userType: UserType.PATIENT,
+                isEmailVerified: false,
+                password: this.sharedService.hashedPassword(args.password),
+            })
+
+            const newPatient = new this.userModel(patient)
+
+            // Send verification code (email or phone)
+            const msg = await this.sendAccountVerificationCode(args, newPatient)
+            this.logger.log(`Verification code sent successfully for user ${newPatient._id.toString()}`, this.signup.name)
+            await newPatient.save()
+            return this.sharedService.sendResponse(msg)
+        } catch (error) {
+            this.sharedService.sendError(error, this.signup.name)
+        }
+    }
+
+    async resendEmailOrSms(args: RetryAccountVerificationDTO) {
+        try {
+            this.logger.log(`Resend verification request for: ${args.email}`)
+            const patientInDb = await this.userModel.findOne({ email: args.email }).exec()
+            if (!patientInDb) {
+                this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.PATIENT_NOT_FOUND)
+            }
+            const msg = await this.sendAccountVerificationCode(args, patientInDb)
+            return this.sharedService.sendResponse(msg)
+        } catch (error) {
+            this.sharedService.sendError(error, this.resendEmailOrSms.name)
+        }
+    }
+
+    async accountVerification(args: AccountVerificationDTO) {
+        try {
+            // Log the start of account verification process
+            this.logger.log('Processing account verification request', this.accountVerification.name)
+            this.logger.debug(`Verification attempt for: ${args.email}`, this.accountVerification.name)
+
+            // Handle email verification flow
+            this.logger.log('Starting email verification process', this.accountVerification.name)
+
+            // Verify the email verification code
+            await this.verifyAccountCode(`verify${args.email}`, args.code)
+            this.logger.debug('Email verification code validated successfully', this.accountVerification.name)
+
+            // Retrieve user by email
+            const user = await this.userModel.findOne({ email: args.email }).exec()
+            if (!user) {
+                this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.PATIENT_NOT_FOUND)
+            }
+            this.logger.debug(`User found for email verification: ${user._id.toString()}`, this.accountVerification.name)
+
+            // Check if email is already verified
+            if (user.isEmailVerified) {
+                this.logger.warn(`Email verification attempted for already verified user: ${user._id.toString()}`, this.accountVerification.name)
+                this.exceptionService.sendNotAcceptableException(RESPONSE_MESSAGES.PATIENT_EMAIL_ALREADY_VERIFIED)
+            }
+
+            // Mark email as verified
+            user.isEmailVerified = true
+            this.logger.log(`Email marked as verified for user: ${user._id.toString()}`, this.accountVerification.name)
+
+            if (user!.isBlocked) this.exceptionService.sendUnprocessableEntityException(RESPONSE_MESSAGES.USER_BLOCKED)
+
+            // Update user status and verification flags in database
+            // Perform database update
+            await this.userModel.updateOne({ _id: user._id }, user)
+            this.logger.log(`User verified successfully: ${user.id}`, this.accountVerification.name)
+            this.logger.debug(`User verification status updated: ${user.isEmailVerified}`, this.accountVerification.name)
+
+            // Return success response
+            this.logger.log('Account verification completed successfully', this.accountVerification.name)
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.EMAIL_VERIFIED)
+        } catch (error) {
+            this.sharedService.sendError(error, this.accountVerification.name)
         }
     }
 
@@ -178,6 +282,51 @@ export class PatientService {
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY)
         } catch (error) {
             this.sharedService.sendError(error, this.patientAnalyzeItself.name)
+        }
+    }
+
+    async sendAccountVerificationCode(args: RetryAccountVerificationDTO, user: User) {
+        try {
+            let msg: string
+            // generate verification code
+            const code = randomString.generate({ length: 6, charset: 'numeric' })
+            this.logger.debug(`Verification code generated for user : ${args.email}`)
+            if (args.email) {
+                if (user.isEmailVerified) {
+                    this.logger.warn(`User email already verified: ${user._id.toString()}`)
+                    this.exceptionService.sendNotAcceptableException(RESPONSE_MESSAGES.EMAIL_ALREADY_VERIFIED)
+                }
+                if (await this.accountVerificationCache.get(`verify${args.email}`)) {
+                    this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.WAIT_TO_RESEND_AGAIN)
+                }
+                // send an email to user for account verification
+                const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Patient'
+                const isVerificationSent = await Mailer.sendEmailVerificationCode(args.email, name, code) // code expiry time is 5 minute
+                if (!isVerificationSent) {
+                    this.exceptionService.sendInternalServerErrorException(RESPONSE_MESSAGES.VERIFICATION_CODE_FAILED)
+                }
+                await this.accountVerificationCache.set(`verify${args.email}`, code, 300000) // 5 * 60 * 1000 = 300000 seconds in MILLISECONDS (1000ms = 1s)
+                msg = RESPONSE_MESSAGES.EMAIL_VERIFICATION_CODE_SENT
+            }
+            return msg
+        } catch (error) {
+            this.sharedService.sendError(error, this.sendAccountVerificationCode.name)
+        }
+    }
+
+    private async verifyAccountCode(key: string, verificationCode: string) {
+        try {
+            const code = await this.accountVerificationCache.get(key)
+            if (!code)
+                this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.CODE_EXPIRED)
+
+            if (verificationCode !== code)
+                this.exceptionService.sendNotAcceptableException(RESPONSE_MESSAGES.INVALID_CODE)
+
+            await this.accountVerificationCache.del(key)
+            return code
+        } catch (error) {
+            this.sharedService.sendError(error, this.verifyAccountCode.name)
         }
     }
 }

@@ -17,6 +17,9 @@ import { ResetPasswordDTO } from 'src/admin/dtos/reset_password.dto'
 import { EditProfileDTO } from 'src/doctor/dtos/edit_profile.dto'
 import { DoctorsListingDTO } from 'src/doctor/dtos/doctors_listing.dto'
 import { UserListingDTO } from './dtos/user-listing.dto'
+import { SetPasswordDTO } from 'src/admin/dtos/set_password.dto'
+import { ResendEmailDTO } from 'src/admin/dtos/resend_email.dto'
+import { RetryAccountVerificationDTO } from 'src/admin/dtos/retry_account_verification.dto'
 
 @Injectable()
 export class UserService {
@@ -134,6 +137,70 @@ export class UserService {
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.PASS_CHANGED_SUCCESSFULLY)
         } catch (error) {
             this.sharedService.sendError(error, this.resetPassword.name)
+        }
+    }
+
+    async sendSetPasswordCode(args: RetryAccountVerificationDTO, doctor: User) {
+        try {
+            let msg: string
+            // generate verification code
+            const code = randomString.generate({ length: 6, charset: 'numeric' })
+            this.logger.debug(`Set Password code generated for doctor : ${args.email}`)
+            if (args.email) {
+                if (doctor.isEmailVerified) {
+                    this.logger.warn(`Doctor email already verified: ${doctor._id}`)
+                    this.exceptionService.sendNotAcceptableException(RESPONSE_MESSAGES.DOCTOR_EMAIL_ALREADY_VERIFIED)
+                }
+                if (await this.accountVerificationCache.get(`setPassword${args.email}`)) {
+                    this.exceptionService.sendForbiddenException(RESPONSE_MESSAGES.WAIT_TO_RESEND_AGAIN)
+                }
+                // send an email to doctor for account verification
+                // TODO: Will send email verification code dynamically after setting up sendgrid templates
+                // const isVerificationSent = await Mailer.sendEmailVerificationCode(args.email, code, 5) // code expiry time is 5 minute
+                // if (!isVerificationSent) {
+                // 	this.exceptionService.sendInternalServerErrorException(ResponseMessagesEnum.VerificationCodeFailed)
+                // }
+                await this.accountVerificationCache.set(`setPassword${args.email}`, '123456', 300000) // 5 * 60 * 1000 = 300000 seconds in MILLISECONDS (1000ms = 1s)
+                msg = RESPONSE_MESSAGES.EMAIL_VERIFICATION_CODE_SENT
+            } else {
+                // TODO: if we support phone number in future
+            }
+            return msg
+        } catch (error) {
+            this.sharedService.sendError(error, this.sendSetPasswordCode.name)
+        }
+    }
+
+    async resendEmail(args: ResendEmailDTO) {
+        try {
+            const doctor = await this.userModel.findOne({ email: args.email, userType: UserType.DOCTOR }).exec()
+            if (!doctor) this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.DOCTOR_NOT_FOUND)
+
+            // Resend Set password code (email or phone)
+            const msg = await this.sendSetPasswordCode(args, doctor)
+            this.logger.log(`Verification code sent successfully for patient ${doctor._id}`, this.resendEmail.name)
+            return this.sharedService.sendResponse(msg)
+        } catch (error) {
+            this.sharedService.sendError(error, this.resendEmail.name)
+        }
+    }
+
+    async setPassword(args: SetPasswordDTO, doctor?: User) {
+        try {
+            this.sharedService.passwordsVerificatoin(args.password, args.confirmPassword)
+            if (args.email)
+                await this.verifyAccountCode(`setPassword${args.email}`, args.code)
+
+            doctor = await this.userModel.findOne({ email: args.email, userType: UserType.DOCTOR }).exec()
+            if (doctor.password !== process.env.DEFAULT_PASSWORD) {
+                this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.PASSWORD_ALREADY_SET)
+            }
+            doctor.password = this.sharedService.hashedPassword(args.password)
+            doctor.isEmailVerified = true
+            await this.userModel.updateOne({ _id: doctor._id }, { password: doctor.password, isEmailVerified: doctor.isEmailVerified })
+            return this.sharedService.sendResponse(RESPONSE_MESSAGES.PASSWORD_SET)
+        } catch (error) {
+            this.sharedService.sendError(error, this.setPassword.name)
         }
     }
 

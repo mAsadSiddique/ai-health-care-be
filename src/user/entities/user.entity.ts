@@ -52,6 +52,9 @@ export class User {
     salary: DoctorSalaryType
 
     @Prop()
+    doctorFee: number
+
+    @Prop()
     qualification: string
 
     @Prop()

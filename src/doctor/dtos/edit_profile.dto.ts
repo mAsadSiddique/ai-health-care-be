@@ -168,6 +168,16 @@ export class EditProfileDTO {
     @IsOptional()
     @IsString()
     emergencyContact: string
+
+    @ApiPropertyOptional({
+        description: 'Enter the doctor fee',
+        type: Number,
+        nullable: true,
+    })
+    @IsOptional()
+    @IsNumber()
+    @IsInt()
+    doctorFee: number
 }
 
 export class UpdatePatientDTO extends IntersectionType(IdDTO, EditProfileDTO) { }

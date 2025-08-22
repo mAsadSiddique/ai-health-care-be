@@ -44,6 +44,22 @@ export enum RESPONSE_MESSAGES {
 	DATA_SAVED_SUCCESSFULLY = 'Analyzed data saved successfully',
 	PATIENT_EMAIL_ALREADY_VERIFIED = 'Patient email already verified successfully',
 
+	// Appointment
+	APPOINTMENT_BOOKED_SUCCESSFULLY = 'appointment booked successfully',
+	APPOINTMENT_CREATED_SUCCESSFULLY = 'appointment created successfully',
+	APPOINTMENT_STATUS_UPDATED = 'appointment status updated successfully',
+	APPOINTMENT_CANCELLED_SUCCESSFULLY = 'appointment cancelled successfully',
+	APPOINTMENT_DELETED_SUCCESSFULLY = 'appointment deleted successfully',
+	APPOINTMENT_NOT_FOUND = 'appointment not found',
+	APPOINTMENT_TIME_CONFLICT = 'appointment time conflicts with existing appointment',
+	APPOINTMENT_CANNOT_APPROVE_REJECTED = 'cannot approve a rejected appointment',
+	APPOINTMENT_CANNOT_REJECT_APPROVED = 'cannot reject an approved appointment',
+	APPOINTMENT_REJECTION_REASON_REQUIRED = 'rejection reason is required when rejecting an appointment',
+	APPOINTMENT_CANNOT_CANCEL_WITHIN_24H = 'appointments can only be cancelled at least 24 hours in advance',
+	APPOINTMENT_CANNOT_DELETE_APPROVED = 'cannot delete approved or completed appointments',
+	APPOINTMENT_LISTING = 'appointments listed below',
+	DOCTOR_FEE_NOT_SET = 'doctor fee is not set',
+
 
 	// Email
 	EMAIL_ALREADY_VERIFIED = 'email already verified',

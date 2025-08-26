@@ -103,7 +103,7 @@ export class UserService {
                 if (!iscodeSent) {
                     this.exceptionService.sendInternalServerErrorException(RESPONSE_MESSAGES.EMAIL_RESEND_FAILED)
                 }
-                await this.accountVerificationCache.set(`resetPassword${args.email}`, '123456', 300000) // 5 * 60 * 1000 = 300000 seconds in MILLISECONDS (1000ms = 1s)
+                await this.accountVerificationCache.set(`resetPassword${args.email}`, code, 300000) // 5 * 60 * 1000 = 300000 seconds in MILLISECONDS (1000ms = 1s)
                 msg = RESPONSE_MESSAGES.EMAIL_RESET_CODE_SENT
             } else {
                 // TODO: will implement phone number logic

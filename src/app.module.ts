@@ -8,6 +8,7 @@ import { DoctorModule } from './doctor/doctor.module'
 import { UserModule } from './user/user.module'
 import { PatientModule } from './patient/patient.module'
 import { AppointmentModule } from './appointment/appointment.module'
+import { SharedModule } from './shared/shared.module'
 import * as dotenv from 'dotenv'
 import { ScheduleModule } from '@nestjs/schedule'
 import { CacheModule } from '@nestjs/cache-manager'
@@ -24,6 +25,7 @@ dotenv.config()
 			ttl: 0.5 * 60 * 1000, // Optional: Time-to-live (in milliseconds), default is 30 seconds
 			max: 100, // Optional: Maximum number of items in cache
 		}),
+		SharedModule,
 		AdminModule,
 		DoctorModule,
 		UserModule,

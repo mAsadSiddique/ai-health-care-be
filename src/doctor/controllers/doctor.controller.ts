@@ -6,6 +6,8 @@ import { DoctorsListingDTO } from '../dtos/doctors_listing.dto'
 import { GuardName } from '../../auth/decorators/guards.decorator'
 import { GuardsEnum } from '../../utils/enums/guards.enum'
 import { CommonAuthGuard } from '../../auth/guard/common-auth.guard'
+import { UserTypeGuard } from 'src/auth/decorators/user-type.decorator'
+import { UserType } from 'src/utils/enums/user-type.enum'
 
 @ApiTags('doctor')
 @ApiBearerAuth('JWT')
@@ -16,8 +18,7 @@ export class DoctorController {
     ) { }
 
     @ApiOkResponse({ description: RESPONSE_MESSAGES.DOCTOR_LISTING })
-    @GuardName(GuardsEnum.DOCTOR)
-    @UseGuards(CommonAuthGuard)
+    @UserTypeGuard(UserType.PATIENT, UserType.DOCTOR)
     @Get('/')
     async doctorListing(@Query() args: DoctorsListingDTO) {
         return await this.doctorService.doctorsListing(args)

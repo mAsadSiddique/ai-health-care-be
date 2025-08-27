@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { SharedModule } from './../shared/shared.module'
 import { CommonAuthGuard } from './guard/common-auth.guard'
+import { UserTypeAuthGuard } from './guard/user-type-auth.guard'
 import { User, UserSchema } from '../user/entities/user.entity'
 
 @Module({
@@ -11,7 +12,7 @@ import { User, UserSchema } from '../user/entities/user.entity'
 		]),
 		forwardRef(() => SharedModule)
 	],
-	providers: [CommonAuthGuard],
-	exports: [CommonAuthGuard],
+	providers: [CommonAuthGuard, UserTypeAuthGuard],
+	exports: [CommonAuthGuard, UserTypeAuthGuard],
 })
 export class AuthModule {}

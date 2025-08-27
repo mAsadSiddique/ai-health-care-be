@@ -40,27 +40,29 @@ export class AppointmentService {
                 this.exceptionService.sendBadRequestException(RESPONSE_MESSAGES.DOCTOR_FEE_NOT_SET)
             }
 
-            // Check for appointment conflicts
+            // Check for appointment conflicts using a simpler approach
             const appointmentDateTime = new Date(args.appointmentDateTime)
             const endTime = new Date(appointmentDateTime.getTime() + args.duration * 60000)
 
-            const conflictingAppointment = await this.appointmentModel.findOne({
+            // Find all existing appointments for this doctor that could conflict
+            const existingAppointments = await this.appointmentModel.find({
                 doctorId: new Types.ObjectId(args.doctorId),
-                status: { $in: [AppointmentStatus.PENDING, AppointmentStatus.APPROVED] },
-                $or: [
-                    {
-                        appointmentDateTime: { $lt: endTime },
-                        $expr: {
-                            $gt: {
-                                $add: ['$appointmentDateTime', { $multiply: ['$duration', 60000] }]
-                            },
-                            appointmentDateTime
-                        }
-                    }
-                ]
+                status: { $in: [AppointmentStatus.PENDING, AppointmentStatus.APPROVED] }
             })
 
-            if (conflictingAppointment) {
+            // Check for conflicts manually
+            const hasConflict = existingAppointments.some(existingAppointment => {
+                const existingStart = new Date(existingAppointment.appointmentDateTime)
+                const existingEnd = new Date(existingStart.getTime() + existingAppointment.duration * 60000)
+
+                // Check if appointments overlap
+                return (
+                    (appointmentDateTime < existingEnd && endTime > existingStart) ||
+                    (existingStart < endTime && existingEnd > appointmentDateTime)
+                )
+            })
+
+            if (hasConflict) {
                 this.exceptionService.sendBadRequestException(RESPONSE_MESSAGES.APPOINTMENT_TIME_CONFLICT)
             }
 
@@ -135,27 +137,29 @@ export class AppointmentService {
                 this.exceptionService.sendNotFoundException(RESPONSE_MESSAGES.PATIENT_NOT_FOUND)
             }
 
-            // Check for appointment conflicts
+            // Check for appointment conflicts using a simpler approach
             const appointmentDateTime = new Date(args.appointmentDateTime)
             const endTime = new Date(appointmentDateTime.getTime() + args.duration * 60000)
 
-            const conflictingAppointment = await this.appointmentModel.findOne({
+            // Find all existing appointments for this doctor that could conflict
+            const existingAppointments = await this.appointmentModel.find({
                 doctorId: doctor._id,
-                status: { $in: [AppointmentStatus.PENDING, AppointmentStatus.APPROVED] },
-                $or: [
-                    {
-                        appointmentDateTime: { $lt: endTime },
-                        $expr: {
-                            $gt: {
-                                $add: ['$appointmentDateTime', { $multiply: ['$duration', 60000] }]
-                            },
-                            appointmentDateTime
-                        }
-                    }
-                ]
+                status: { $in: [AppointmentStatus.PENDING, AppointmentStatus.APPROVED] }
             })
 
-            if (conflictingAppointment) {
+            // Check for conflicts manually
+            const hasConflict = existingAppointments.some(existingAppointment => {
+                const existingStart = new Date(existingAppointment.appointmentDateTime)
+                const existingEnd = new Date(existingStart.getTime() + existingAppointment.duration * 60000)
+
+                // Check if appointments overlap
+                return (
+                    (appointmentDateTime < existingEnd && endTime > existingStart) ||
+                    (existingStart < endTime && existingEnd > appointmentDateTime)
+                )
+            })
+
+            if (hasConflict) {
                 this.exceptionService.sendBadRequestException(RESPONSE_MESSAGES.APPOINTMENT_TIME_CONFLICT)
             }
 

@@ -6,6 +6,7 @@ import { Roles } from '../../utils/enums/roles.enum'
 import { GenderEnum } from 'src/utils/enums/gender.enum'
 import { UserDobType } from 'src/utils/enums/dob.type'
 import { DoctorSalaryType } from 'src/utils/types/doctor.types'
+import { PatientCondition } from '../../utils/enums/patient-condition.enum'
 
 export type UserDocument = User & Document
 
@@ -72,6 +73,9 @@ export class User {
 
     @Prop()
     emergencyContact: string
+
+    @Prop({ type: String, enum: PatientCondition, default: PatientCondition.NOT_ANALYZED })
+    patientCondition: PatientCondition
 
     // Common fields
     @Prop()

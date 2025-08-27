@@ -1,6 +1,27 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsMongoId, IsNotEmpty, IsNotEmptyObject } from "class-validator";
 
+export interface HealthAssessmentResult {
+    health_status: string;
+    confidence_score: number;
+    suggested_action: string;
+    prediction_details: any;
+    risk_summary: any;
+}
+
+export interface AnalyzeResultData {
+    general_health_assessment: HealthAssessmentResult;
+    comprehensive_cvd_assessment: any;
+    combined_meta: any;
+}
+
+export interface AnalyzeResult {
+    success: boolean;
+    message: string;
+    data: AnalyzeResultData;
+    error_code: string | null;
+}
+
 export class AnalyzeDataDTO {
     @ApiPropertyOptional({
         description: 'Analyze data payload',
@@ -16,7 +37,7 @@ export class AnalyzeDataDTO {
     })
     @IsNotEmpty()
     @IsNotEmptyObject({ nullable: false })
-    analyzingData: JSON
+    analyzingData: any
 
     @ApiPropertyOptional({
         description: 'Analyzed result',
@@ -115,7 +136,7 @@ export class AnalyzeDataDTO {
     })
     @IsNotEmpty()
     @IsNotEmptyObject({ nullable: false })
-    analyzingResult: JSON
+    analyzingResult: AnalyzeResult
 }
 
 export class DoctorAnalyzeDataDTO extends AnalyzeDataDTO {

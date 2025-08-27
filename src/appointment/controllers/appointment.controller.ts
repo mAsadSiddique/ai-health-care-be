@@ -21,7 +21,6 @@ export class AppointmentController {
 
     @Post('book')
     @GuardName(GuardsEnum.PATIENT)
-    @UseGuards(RoleGuard)
     @ApiOperation({ summary: 'Book an appointment with a doctor' })
     @ApiResponse({ status: 201, description: 'Appointment booked successfully' })
     @ApiResponse({ status: 400, description: 'Bad request - validation error or conflict' })
@@ -35,7 +34,6 @@ export class AppointmentController {
 
     @Post('doctor/create')
     @GuardName(GuardsEnum.DOCTOR)
-    @UseGuards(RoleGuard)
     @ApiOperation({ summary: 'Doctor creates an appointment for a patient' })
     @ApiResponse({ status: 201, description: 'Appointment created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request - validation error or conflict' })
@@ -49,7 +47,6 @@ export class AppointmentController {
 
     @Put('doctor/status')
     @GuardName(GuardsEnum.DOCTOR)
-    @UseGuards(RoleGuard)
     @ApiOperation({ summary: 'Update appointment status (approve/reject)' })
     @ApiParam({ name: 'id', description: 'Appointment ID' })
     @ApiResponse({ status: 200, description: 'Appointment status updated successfully' })
@@ -64,7 +61,6 @@ export class AppointmentController {
 
     @Get('/')
     @GuardName(GuardsEnum.PATIENT)
-    @UseGuards(RoleGuard)
     @ApiOperation({ summary: 'Get patient appointments with filters' })
     @ApiQuery({ name: 'status', required: false, enum: ['PENDING', 'APPROVED', 'REJECTED', 'COMPLETED'] })
     @ApiQuery({ name: 'date', required: false, description: 'Filter by date (YYYY-MM-DD)' })
@@ -80,7 +76,6 @@ export class AppointmentController {
 
     @Get('doctor/')
     @GuardName(GuardsEnum.DOCTOR)
-    @UseGuards(RoleGuard)
     @ApiOperation({ summary: 'Get doctor appointments with filters' })
     @ApiQuery({ name: 'status', required: false, enum: ['PENDING', 'APPROVED', 'REJECTED', 'COMPLETED'] })
     @ApiQuery({ name: 'date', required: false, description: 'Filter by date (YYYY-MM-DD)' })

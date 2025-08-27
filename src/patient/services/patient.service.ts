@@ -20,6 +20,7 @@ import * as randomString from 'randomstring'
 import { SignupDTO } from '../dtos/signup.dto'
 import { AccountVerificationDTO } from '../dtos/account_verification.dto'
 import { AnalyzeDataListingDTO } from '../dtos/analyze_data_listing.dto'
+import { StatisticsService } from '../../shared/services/statistics.service'
 
 @Injectable()
 export class PatientService {
@@ -32,7 +33,8 @@ export class PatientService {
         @InjectModel(PatientAnalyzeData.name)
         private readonly patiendAnalyzeDataModel: Model<PatientAnalyzeDataDocument>,
         private readonly exceptionService: ExceptionService,
-        private readonly sharedService: SharedService
+        private readonly sharedService: SharedService,
+        private readonly statisticsService: StatisticsService
     ) { }
 
     async addPatient(args: AddPatientDTO, doctor: User) {
@@ -269,6 +271,13 @@ export class PatientService {
             analyzeData.patientId = patient._id
             analyzeData.patientDoctorId = doctor._id
             await analyzeData.save()
+
+            // Update patient condition based on health status
+            if (args.analyzingResult?.data?.general_health_assessment?.health_status) {
+                const healthStatus = args.analyzingResult.data.general_health_assessment.health_status
+                await this.statisticsService.updatePatientCondition(patient._id.toString(), healthStatus)
+            }
+
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY, analyzeData)
         } catch (error) {
             this.sharedService.sendError(error, this.patientAnalyze.name)
@@ -280,6 +289,13 @@ export class PatientService {
             const analyzeData = new this.patiendAnalyzeDataModel(args)
             analyzeData.patientId = patient._id
             await analyzeData.save()
+
+            // Update patient condition based on health status
+            if (args.analyzingResult?.data?.general_health_assessment?.health_status) {
+                const healthStatus = args.analyzingResult.data.general_health_assessment.health_status
+                await this.statisticsService.updatePatientCondition(patient._id.toString(), healthStatus)
+            }
+
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY, analyzeData)
         } catch (error) {
             this.sharedService.sendError(error, this.patientAnalyzeItself.name)
@@ -333,7 +349,7 @@ export class PatientService {
 
     async listAnalyzeData(filters: AnalyzeDataListingDTO, patient: User) {
         try {
-            const query: any = {}
+            const query: any = { patientId: patient._id }
 
             // Apply optional filters
             if (filters.id) {

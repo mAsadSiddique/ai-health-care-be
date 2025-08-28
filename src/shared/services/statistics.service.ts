@@ -90,10 +90,8 @@ export class StatisticsService {
         }
     }
 
-    async getAppointmentStats(filter: AppointmentStatsFilterDto, user:User): Promise<AppointmentStatsResponseDto> {
+    async getAppointmentStats(filter: AppointmentStatsFilterDto, user: User): Promise<AppointmentStatsResponseDto> {
         const matchStage: any = { deletedAt: null }
-        if (user.userType === UserType.PATIENT)
-            matchStage.patientId = user._id
         
         if (filter.doctorId) {
             matchStage.doctorId = new Types.ObjectId(filter.doctorId)

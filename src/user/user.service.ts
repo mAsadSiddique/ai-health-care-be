@@ -56,8 +56,8 @@ export class UserService {
             let payload: any = this.getPayload(userInDB)
             const jwtToken = this.sharedService.getJwt(payload)
             data['jwtToken'] = jwtToken
-            payload = this.getProfileData(userInDB)
-            data['user'] = payload
+            userInDB.password = undefined
+            data['user'] = userInDB
 
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.LOGGED_IN, data)
         } catch (error) {

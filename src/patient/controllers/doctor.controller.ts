@@ -37,8 +37,8 @@ export class DoctorPatientController {
     @GuardName(GuardsEnum.DOCTOR)
     @UseGuards(CommonAuthGuard)
     @Get('/')
-    async patientListing(@Query() args: PatientsListingDTO) {
-        return await this.patientService.patientsListing(args)
+    async patientListing(@Query() args: PatientsListingDTO, @user() doctor: User) {
+        return await this.patientService.patientsListing(args, doctor)
     }
 
     @ApiOkResponse({ description: 'patient block/unblock successfully' })

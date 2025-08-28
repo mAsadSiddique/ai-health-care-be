@@ -171,9 +171,9 @@ export class PatientService {
         }
     }
 
-    async patientsListing(args: PaginationDTO & { search?: string, isBlocked?: boolean, isEmailVerified?: boolean }) {
+    async patientsListing(args: PaginationDTO & { search?: string, isBlocked?: boolean, isEmailVerified?: boolean }, doctor: User) {
         try {
-            let query: any = { userType: UserType.PATIENT }
+            let query: any = { userType: UserType.PATIENT, PatientDoctorId: doctor._id }
             if (args.hasOwnProperty('isBlocked') && args.isBlocked !== undefined) {
                 query['isBlocked'] = args.isBlocked
             }

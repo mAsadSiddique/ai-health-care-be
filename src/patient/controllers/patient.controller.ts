@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put, Get, Query, UseGuards, Param } from '@nestjs/common'
+import { Body, Controller, Post, Put, Get, Query, UseGuards, Param, Req, Res } from '@nestjs/common'
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { RESPONSE_MESSAGES } from 'src/utils/enums/response_messages.enum'
 import { PatientService } from '../services/patient.service'
@@ -12,6 +12,10 @@ import { SignupDTO } from '../dtos/signup.dto'
 import { AccountVerificationDTO } from '../dtos/account_verification.dto'
 import { RetryAccountVerificationDTO } from 'src/admin/dtos/retry_account_verification.dto'
 import { AnalyzeDataListingDTO } from '../dtos/analyze_data_listing.dto'
+import { GoogleAuthGuard } from '../social_login-strategies/google.strategy'
+import { UserSocialLoginType } from 'src/utils/types/user_social_login.type'
+import { Request, Response } from 'express'
+
 
 @ApiTags('patient')
 @Controller('patient')
@@ -51,6 +55,17 @@ export class PatientController {
     @Post('/resend/account/verification')
     async resendEmailOrSms(@Body() args: RetryAccountVerificationDTO) {
         return await this.patientService.resendEmailOrSms(args)
+    }
+
+    @Get('/google')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuth() { }
+
+    @Get('/google/redirect')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+        const url = await this.patientService.googleLogin(req?.['user'] as UserSocialLoginType)
+        res.redirect(url)
     }
 }
 

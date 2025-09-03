@@ -7,6 +7,7 @@ import { GenderEnum } from 'src/utils/enums/gender.enum'
 import { UserDobType } from 'src/utils/enums/dob.type'
 import { DoctorSalaryType } from 'src/utils/types/doctor.types'
 import { PatientCondition } from '../../utils/enums/patient-condition.enum'
+import { RegisterationTypeEnum } from 'src/utils/types/user_social_login.type'
 
 export type UserDocument = User & Document
 
@@ -86,6 +87,9 @@ export class User {
 
     @Prop({ default: false })
     isBlocked: boolean
+
+    @Prop({ name: 'registration_type', type: String, enum: RegisterationTypeEnum, default: RegisterationTypeEnum.EMAIL })
+    registrationType!: RegisterationTypeEnum
 
     @Prop()
     createdAt: Date

@@ -21,6 +21,7 @@ import { SignupDTO } from '../dtos/signup.dto'
 import { AccountVerificationDTO } from '../dtos/account_verification.dto'
 import { AnalyzeDataListingDTO } from '../dtos/analyze_data_listing.dto'
 import { StatisticsService } from '../../shared/services/statistics.service'
+import { RegisterationTypeEnum, UserSocialLoginType } from 'src/utils/types/user_social_login.type'
 
 @Injectable()
 export class PatientService {
@@ -108,6 +109,64 @@ export class PatientService {
             return this.sharedService.sendResponse(msg)
         } catch (error) {
             this.sharedService.sendError(error, this.signup.name)
+        }
+    }
+
+    async googleLogin(args: UserSocialLoginType) {
+        try {
+            let user: User
+            let url = `${process.env.FE_SOCIAL_MEDIA_REDIRECT_URL}?status=404`
+            if (args) {
+                user = (await this.userModel.findOne({ email: args.email }).exec()) || new User(args)
+                if (!user._id) {
+                    user.password = this.sharedService.hashedPassword(args.password)
+                    user.isEmailVerified = true
+                    user.registrationType = RegisterationTypeEnum.GOOGLE
+                    user.userType = UserType.PATIENT
+                    new this.userModel(user)
+                    this.logger.log(`[GoogleLogin] New user registered successfully. Username: ${user.firstName}`, this.googleLogin.name)
+                } else if (user.isEmailVerified === false) {
+                    user.isEmailVerified = true
+                    await this.userModel.updateOne({ _id: user._id }, user)
+                    this.logger.log(`[GoogleLogin] Existing user with pending verification was successfully activated: ${user.firstName}`, this.googleLogin.name)
+                }
+                url = this.getSocialMediaLoginRedirectUrl(user)
+            }
+            this.logger.log(`[GoogleLogin] Redirecting to URL: ${url}`, this.googleLogin.name)
+            return url
+        } catch (error) {
+            this.sharedService.sendError(error, this.googleLogin.name)
+        }
+    }
+
+    /**
+     * Generates a redirect URL after successful social media login.
+     *
+     * It creates a JWT token based on the user's login payload and appends it,
+     * along with the user payload, to the redirect URL as query parameters.
+     *
+     * @param user - The authenticated user entity.
+     * @returns A redirect URL containing status, token, and user payload.
+     */
+    private getSocialMediaLoginRedirectUrl(user: User) {
+        try {
+            this.logger.log(`[RedirectURL] Generating redirect URL for user: ${user.firstName}`, this.getSocialMediaLoginRedirectUrl.name)
+            // Generate the login payload
+            const payload = this.getPayload(user)
+            const token = this.sharedService.getJwt(payload)
+            // Return final redirect URL with query params
+            return `${process.env.FE_SOCIAL_MEDIA_REDIRECT_URL}?status=200&token=${token}&user=${JSON.stringify(payload)}`
+        } catch (error) {
+            this.sharedService.sendError(error, this.getSocialMediaLoginRedirectUrl.name)
+        }
+    }
+
+    private getPayload(user: any) {
+        return {
+            email: user.email,
+            firstName: user.firstName,
+            userType: user.userType,
+            role: user.role,
         }
     }
 

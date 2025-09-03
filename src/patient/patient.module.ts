@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module'
 import { User, UserSchema } from 'src/user/entities/user.entity'
 import { DoctorPatientController } from './controllers/doctor.controller'
 import { PatientAnalyzeData, PatientAnalyzeDataSchema } from 'src/user/entities/patient_analyze_data.entity'
+import { GoogleStrategy } from './social_login-strategies/google.strategy'
 
 @Module({
     imports: [
@@ -18,7 +19,7 @@ import { PatientAnalyzeData, PatientAnalyzeDataSchema } from 'src/user/entities/
         AuthModule
     ],
     controllers: [PatientController, DoctorPatientController],
-    providers: [PatientService],
+    providers: [PatientService, GoogleStrategy],
     exports: [PatientService],
 })
 export class PatientModule {}

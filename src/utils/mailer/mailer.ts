@@ -121,8 +121,7 @@ export class Mailer {
 		patientName: string,
 		patientEmail: string,
 		patientPhone: string,
-		healthStatus: string,
-		analysisDetails: any
+		healthStatus: string
 	): Promise<boolean> {
 		sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
 
@@ -135,21 +134,36 @@ export class Mailer {
 			return result
 		}
 
-		// split into 500-recipient chunks
-		const emailChunks = chunkArray(hospitalEmails, 5)
+		// split into 10-recipient chunks
+		const emailChunks = chunkArray(hospitalEmails, 10)
+		// format date as DD-MM-YYYY hh:mm AM/PM
+		const now = new Date()
+		const day = String(now.getDate()).padStart(2, "0")
+		const month = String(now.getMonth() + 1).padStart(2, "0")
+		const year = now.getFullYear()
 
+		let hours = now.getHours()
+		const minutes = String(now.getMinutes()).padStart(2, "0")
+		const ampm = hours >= 12 ? "PM" : "AM"
+		hours = hours % 12
+		hours = hours ? hours : 12 // 0 → 12
+
+		const formattedTime = `${day}-${month}-${year} ${String(hours).padStart(
+			2,
+			"0"
+		)}:${minutes} ${ampm}`
 		try {
 			for (const chunk of emailChunks) {
 				const msg = {
-					to: chunk, // send to up to 500 emails at once
+					to: chunk,
 					from: process.env.SUPPORT_SENDER_EMAIL!,
-					templateId: "d-80ea5d503f1f4da89dc2b697ed391f45",
+					templateId: "d-4af8cd353bb14c1b86035fd72cbb0ff7",
 					dynamic_template_data: {
+						alertTime: formattedTime,
 						patientName,
 						patientEmail,
 						patientPhone,
 						healthStatus,
-						analysisDetails,
 					},
 				}
 

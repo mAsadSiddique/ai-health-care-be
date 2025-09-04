@@ -358,7 +358,7 @@ export class PatientService {
 
                 // Check if patient condition is critical and send hospital alerts
                 if (healthStatus.toLowerCase().includes('critical')) {
-                    await this.sendHospitalAlerts(patient, healthStatus, args.analyzingResult)
+                    this.sendHospitalAlerts(patient, healthStatus)
                 }
             }
 
@@ -368,7 +368,7 @@ export class PatientService {
         }
     }
 
-    private async sendHospitalAlerts(patient: User, healthStatus: string, analyzingResult: any) {
+    private async sendHospitalAlerts(patient: User, healthStatus: string) {
         try {
             // Get hospital emails from the service
             const hospitalEmails = await this.hospitalService.getAllActiveHospitalEmails()
@@ -384,8 +384,7 @@ export class PatientService {
                     patientName,
                     patientEmail,
                     patientPhone,
-                    healthStatus,
-                    analyzingResult
+                    healthStatus
                 )
 
                 this.logger.log(`Hospital alerts sent to ${hospitalEmails.length} hospitals for critical patient ${patient._id}`)

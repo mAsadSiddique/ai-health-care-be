@@ -57,4 +57,3 @@ export class AdminHospitalController {
         return await this.hospitalService.listHospitals(filters)
     }
 }
-

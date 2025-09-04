@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module'
 import { PatientModule } from './patient/patient.module'
 import { AppointmentModule } from './appointment/appointment.module'
 import { SharedModule } from './shared/shared.module'
+import { HospitalModule } from './hospital/hospital.module'
 import * as dotenv from 'dotenv'
 import { ScheduleModule } from '@nestjs/schedule'
 import { CacheModule } from '@nestjs/cache-manager'
@@ -31,6 +32,7 @@ dotenv.config()
 		UserModule,
 		PatientModule,
 		AppointmentModule,
+		HospitalModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

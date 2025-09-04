@@ -42,6 +42,8 @@ export enum RESPONSE_MESSAGES {
 	PATIENT_LISTING = 'patients listed below',
 	PATIENT_PROFILE_UPDATED = 'patient profile updated successfully',
 	DATA_SAVED_SUCCESSFULLY = 'Analyzed data saved successfully',
+	DATA_UPDATED_SUCCESSFULLY = 'Data updated successfully',
+	DATA_DELETED_SUCCESSFULLY = 'Data deleted successfully',
 	PATIENT_EMAIL_ALREADY_VERIFIED = 'Patient email already verified successfully',
 	ANALYZE_DATA_LISTING = 'analyze data listed below',
 

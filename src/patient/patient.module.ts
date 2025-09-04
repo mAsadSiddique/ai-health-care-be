@@ -8,6 +8,7 @@ import { User, UserSchema } from 'src/user/entities/user.entity'
 import { DoctorPatientController } from './controllers/doctor.controller'
 import { PatientAnalyzeData, PatientAnalyzeDataSchema } from 'src/user/entities/patient_analyze_data.entity'
 import { GoogleStrategy } from './social_login-strategies/google.strategy'
+import { HospitalModule } from '../hospital/hospital.module'
 
 @Module({
     imports: [
@@ -16,7 +17,8 @@ import { GoogleStrategy } from './social_login-strategies/google.strategy'
             { name: PatientAnalyzeData.name, schema: PatientAnalyzeDataSchema }
         ]),
         SharedModule,
-        AuthModule
+        AuthModule,
+        HospitalModule
     ],
     controllers: [PatientController, DoctorPatientController],
     providers: [PatientService, GoogleStrategy],

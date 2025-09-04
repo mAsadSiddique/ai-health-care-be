@@ -22,6 +22,7 @@ import { AccountVerificationDTO } from '../dtos/account_verification.dto'
 import { AnalyzeDataListingDTO } from '../dtos/analyze_data_listing.dto'
 import { StatisticsService } from '../../shared/services/statistics.service'
 import { RegisterationTypeEnum, UserSocialLoginType } from 'src/utils/types/user_social_login.type'
+import { HospitalService } from '../../hospital/services/hospital.service'
 
 @Injectable()
 export class PatientService {
@@ -35,7 +36,8 @@ export class PatientService {
         private readonly patiendAnalyzeDataModel: Model<PatientAnalyzeDataDocument>,
         private readonly exceptionService: ExceptionService,
         private readonly sharedService: SharedService,
-        private readonly statisticsService: StatisticsService
+        private readonly statisticsService: StatisticsService,
+        private readonly hospitalService: HospitalService
     ) { }
 
     async addPatient(args: AddPatientDTO, doctor: User) {
@@ -353,11 +355,44 @@ export class PatientService {
             if (args.analyzingResult?.data?.general_health_assessment?.health_status) {
                 const healthStatus = args.analyzingResult.data.general_health_assessment.health_status
                 await this.statisticsService.updatePatientCondition(patient._id.toString(), healthStatus)
+
+                // Check if patient condition is critical and send hospital alerts
+                if (healthStatus.toLowerCase().includes('critical')) {
+                    await this.sendHospitalAlerts(patient, healthStatus, args.analyzingResult)
+                }
             }
 
             return this.sharedService.sendResponse(RESPONSE_MESSAGES.DATA_SAVED_SUCCESSFULLY, analyzeData)
         } catch (error) {
             this.sharedService.sendError(error, this.patientAnalyzeItself.name)
+        }
+    }
+
+    private async sendHospitalAlerts(patient: User, healthStatus: string, analyzingResult: any) {
+        try {
+            // Get hospital emails from the service
+            const hospitalEmails = await this.hospitalService.getAllActiveHospitalEmails()
+
+            if (hospitalEmails.length > 0) {
+                const patientName = `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || 'Patient'
+                const patientEmail = patient.email || 'Not provided'
+                const patientPhone = patient.phoneNumber || 'Not provided'
+
+                // Send alert emails to all hospitals
+                await Mailer.sendHospitalAlert(
+                    hospitalEmails,
+                    patientName,
+                    patientEmail,
+                    patientPhone,
+                    healthStatus,
+                    analyzingResult
+                )
+
+                this.logger.log(`Hospital alerts sent to ${hospitalEmails.length} hospitals for critical patient ${patient._id}`)
+            }
+        } catch (error) {
+            this.logger.error(`Failed to send hospital alerts: ${error.message}`)
+            // Don't throw error to avoid affecting the main analysis flow
         }
     }
 

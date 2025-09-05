@@ -125,7 +125,8 @@ export class PatientService {
                     user.isEmailVerified = true
                     user.registrationType = RegisterationTypeEnum.GOOGLE
                     user.userType = UserType.PATIENT
-                    new this.userModel(user)
+                    const newUser = new this.userModel(user)
+                    await newUser.save()
                     this.logger.log(`[GoogleLogin] New user registered successfully. Username: ${user.firstName}`, this.googleLogin.name)
                 } else if (user.isEmailVerified === false) {
                     user.isEmailVerified = true

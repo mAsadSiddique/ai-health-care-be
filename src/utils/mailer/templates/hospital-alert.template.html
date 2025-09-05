@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Critical Patient Alert</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        .alert-header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .alert-content {
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        .patient-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .analysis-details {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .urgent {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .contact-info {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="alert-header">
+            <div class="logo">🏥 AI Healthcare System</div>
+            <h1>🚨 CRITICAL PATIENT ALERT 🚨</h1>
+            <h2>Immediate Medical Attention Required</h2>
+            <p><strong>Alert Time:</strong> {{alertTime}}</p>
+        </div>
+
+        <div class="alert-content">
+            <div class="patient-info">
+                <h3>Patient Information</h3>
+                <p><strong>Name:</strong> {{patientName}}</p>
+                <p><strong>Email:</strong> {{patientEmail}}</p>
+                <p><strong>Phone:</strong> {{patientPhone}}</p>
+                <p><strong>Health Status:</strong> <span class="urgent">{{healthStatus}}</span></p>
+            </div>
+
+            <div class="analysis-details">
+                <h3>Analysis Details</h3>
+                <pre>{{analysisDetails}}</pre>
+            </div>
+
+            <div class="contact-info">
+                <h3>⚠️ URGENT ACTION REQUIRED</h3>
+                <p>This patient has been identified as having a <strong class="urgent">CRITICAL</strong> health
+                    condition requiring immediate medical attention.</p>
+                <p>Please contact the patient immediately and provide necessary medical assistance.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><em>This is an automated alert from the AI Healthcare System. Please respond immediately.</em></p>
+            <p><strong>Support:</strong> {{supportEmail}} | <strong>Security:</strong> {{securityEmail}}</p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -16,6 +16,7 @@ async function bootstrap() {
       "http://localhost:3001",
       "http://localhost:4200",
       // Add your frontend URL here
+      "http://31.97.221.245:3000",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
@@ -49,6 +50,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT || 3000, "0.0.0.0");
 }
 bootstrap();

@@ -40,9 +40,9 @@ export class AdminController {
   @ApiNotAcceptableResponse({
     description: RESPONSE_MESSAGES.ADMIN_ALREADY_EXIST,
   })
-  // @Role(Roles.SUPER)
-  // @GuardName(GuardsEnum.ADMIN)
-  // @UseGuards(CommonAuthGuard, RoleGuard)
+  @Role(Roles.SUPER)
+  @GuardName(GuardsEnum.ADMIN)
+  @UseGuards(CommonAuthGuard, RoleGuard)
   @Post("/add")
   async addAdmin(@Body() args: AddAdminDTO) {
     return await this.adminService.addAdmin(args);
